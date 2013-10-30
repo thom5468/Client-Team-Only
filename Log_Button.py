@@ -10,6 +10,8 @@ import time
 GREEN = (0, 255, 0)
 LIGHT_BLUE = (30,144,255)
 WHITE = (255,255,255)
+RED = (255, 0, 0)
+BLACK = (0, 0, 0)
 
 BUTTON_TEXT = "Log"
 
@@ -151,7 +153,7 @@ class Log_Button:
         #self.screen.fill(LIGHT_BLUE)
         self.LogFlag = LogFlag
         #Parameters:               surface,     color, x,   y,   length, height, width, text,       text_color
-        self.Button1.create_button(self.screen, GREEN, 10,  550,    100,    30,   0,    BUTTON_TEXT, WHITE)
+        #self.Button1.create_button(self.screen, GREEN, 10,  550,    100,    30,   0,    BUTTON_TEXT, WHITE)
         pygame.display.flip()
         
         if(LogFlag == True):
@@ -160,19 +162,24 @@ class Log_Button:
             #Format the output string
             MY_STRING = "This is a test string"
             my_font = pygame.font.Font(None, 22)
-            my_rect = pygame.Rect((40, 40, 300, 300))
+            my_rect = pygame.Rect((0, 450, 200, 150))
             Log_Window = pygame.Rect((40, 40, 300, 300))
             rendered_text = render_textrect(MY_STRING, my_font, my_rect, (216, 216, 216), (48, 48, 48), 0)
             self.screen.blit(rendered_text, my_rect.topleft)
-            #print "LogFlag is:"+str(LogFlag)
+            #Add a close button to the log
+            #Parameters:                      surface,    color, x,   y,   length, height, width, text,       text_color
+            self.CloseLogButton.create_button(self.screen, RED, 180,  460,    10,    10,   10,    "X", BLACK)
         else:
             #Else, fill over the text window
             self.screen.fill(LIGHT_BLUE)
+            self.LogButton.create_button(self.screen, GREEN, 10,  550,    100,    30,   0,    BUTTON_TEXT, WHITE)
+
     
     #Run the loop
     def main(self):
         LogFlag = False
-        self.Button1 = Buttons.Button()
+        self.LogButton = Buttons.Button()
+        self.CloseLogButton = Buttons.Button()
         self.display()
         self.screen.fill(LIGHT_BLUE)
         while True:
@@ -183,10 +190,13 @@ class Log_Button:
                 elif event.type == MOUSEBUTTONDOWN:
                     #If the Log button is pressed, then display the window
                     #Change to be based off of mouse position
-                    if self.Button1.pressed(pygame.mouse.get_pos()):
-                        print "- Displaying Log"
+                    if self.LogButton.pressed(pygame.mouse.get_pos()):
+                        #print "- Displaying Log"
                         #print self.queue.get()
-                        LogFlag = not LogFlag
+                        LogFlag = True
+                    elif self.CloseLogButton.pressed(pygame.mouse.get_pos()):
+                        #print "- Closing Log"
+                        LogFlag = False
                         
                         
 #Threaded Counting function for demonstration log output
