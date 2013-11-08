@@ -51,7 +51,7 @@ class Environ():
         angle = self.startangle
         while angle < self.endangle:
             angle = angle + UNITANGLE/2
-            self.collidepoints.add(cos(angle)*(averadius+self.center),sin(angle)*(averadius-self.center))
+            self.collidepoints.append((cos(angle)*(self.averadius+self.center[0]),sin(angle)*(self.averadius-self.center[1])))
             angle = angle + UNITANGLE
         self.stacks = len(self.collidepoints)
     def update (self, stacklist):

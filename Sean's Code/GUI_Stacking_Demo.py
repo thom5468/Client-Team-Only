@@ -57,9 +57,9 @@ def main():
     environment.addEnviron(1, 'W', 4, "Humans", 4, "Animals", 'C' )
     environment.environlist[0].expand1()
     environment.addEnviron(2, 'U', 4, "Humans", 4, "Animals", 'C' )
-    environment.environlist[1].shiftdown1()
+    #environment.environlist[1].shiftdown1()
     environment.addEnviron(3, 'F', 3, "H", 2, "A", 'A')
-    environment.environlist[2].shiftdown1()
+    #environment.environlist[2].shiftdown1()
     
     while 1:
         clock.tick(60)
