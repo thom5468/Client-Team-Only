@@ -53,13 +53,7 @@ def main():
     rebelships = pygame.sprite.LayeredUpdates((cis, megathron, viper, vagabond1, vagabond2))
 
     starsystem = System('star system', planets, starbg, animate)
-    environment = environs.EnvironBox(earth.rect)
-    environment.addEnviron(1, 'W', 4, "Humans", 4, "Animals", 'C' )
-    #environment.environlist[0].expand1()
-    environment.addEnviron(2, 'U', 4, "Humans", 4, "Animals", 'C' )
-    #environment.environlist[1].shiftdown1()
-    environment.addEnviron(3, 'F', 3, "H", 2, "A", 'A')
-    #environment.environlist[2].shiftdown1()
+    
     
     while 1:
         clock.tick(60)
@@ -111,11 +105,15 @@ def main():
         rebelships.update()
         controls.update()
         selection.update(mouse_update, animate)
+        
 
         # Refresh the screen
         screen.blit(starbg, (0, 0))
         planets.draw(screen)
-        environment.draw(screen)
+        #environment.draw(screen)
+        for planet in [purple, blue, earth]:
+            planet.environment.update(unitstack.list)
+            planet.environment.draw(screen)
         rebelships.draw(screen)
         for stack in unitstack.list:
             stack.draw(screen)
@@ -250,6 +248,13 @@ class Planet(pygame.sprite.Sprite):
         self.rect.center = self.pos
         self.colliderect = self.rect.inflate(-50, -50)
         self.colliderect.normalize()
+        self.environment = environs.EnvironBox(self.rect)
+        self.environment.addEnviron(1, 'W', 4, "Humans", 4, "Animals", 'C' )
+        #environment.environlist[0].expand1()
+        self.environment.addEnviron(2, 'U', 4, "Humans", 4, "Animals", 'C' )
+        #environment.environlist[1].shiftdown1()
+        self.environment.addEnviron(3, 'F', 3, "H", 2, "A", 'A')
+        #environment.environlist[2].shiftdown1()
 
     def update(self, movedir=None, animate=None):  # Update planet orientation
         self.porient = self.orient
@@ -414,6 +419,8 @@ def unit_unselect_check(unitlist, planetlist, mouse, prev_pos, prev_loc, selecti
         if unitstack.has(unit):
             print 'UNSELECTING STACK'  # Testing
             for planet in planetlist:
+                if planet.environment.addstack(unitstack) != 0:
+                    return True
                 if planet.rect.collidepoint(mouse.pos):
                     print 'STACK LANDING ON:', planet.name  # Testing
                     unitstack.update(unit, planet.colliderect)
@@ -428,6 +435,8 @@ def unit_unselect_check(unitlist, planetlist, mouse, prev_pos, prev_loc, selecti
             if _unit_stack_check(unitlist, unit, selectionlist, unitstack):
                     return True
             for planet in planetlist:
+                if planet.environment.addstack(unitstack) != 0:
+                    return True
                 if planet.rect.collidepoint(mouse.pos):
                     print 'SINGLE LANDING ON:', planet.name  # Testing
                     unit.loc = planet.colliderect  # set the location of the ship to the planet !!

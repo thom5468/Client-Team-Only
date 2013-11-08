@@ -11,7 +11,7 @@ LINECOLOR = (0,200,0)
 
 class Environ():
     def __init__ (self, center, iradius, oradius, number, type, size, race, resources, creature, politics):
-        self.box = pygame.Rect(center[0]-oradius, center[1]-oradius, oradius-iradius, oradius)
+        self.box = pygame.Rect(center[0]-oradius, center[1]-oradius, oradius*2, oradius*2)
         self.number = number
         self.type = type
         self.size = size
@@ -72,11 +72,11 @@ class Environ():
                     stack.update()
         return self.total #amount of growth/shrinkage
     def draw (self, surface):
-        self.startline = pygame.draw.line(surface, self.fillcolor, (self.center[0]+self.oradius*(cos(self.startangle)), self.center[1]-self.oradius*(sin(self.startangle))), (self.center[0]+self.iradius*(cos(self.startangle)), self.center[1]-self.iradius*(sin(self.startangle))), 2)
-        self.endline = pygame.draw.line(surface, self.fillcolor, (self.center[0]+self.oradius*(cos(self.endangle)), self.center[1]-self.oradius*(sin(self.endangle))), (self.center[0]+self.iradius*(cos(self.endangle)), self.center[1]-self.iradius*(sin(self.endangle))), 4)
-        self.oarc = pygame.draw.arc(surface, self.fillcolor, pygame.Rect(self.box.topleft, (2*self.oradius, 2*self.oradius)), self.startangle, self.endangle+pi/72, 3)
-        self.iarc = pygame.draw.arc(surface, self.fillcolor, pygame.Rect(self.box.topleft[0]+(self.oradius-self.iradius), self.box.topleft[1]+(self.oradius-self.iradius), 2*self.iradius, 2*self.iradius), self.startangle, self.endangle + pi/72, 3)
-        #for i in self.collidepoints:
+        pygame.draw.line(surface, self.fillcolor, (self.center[0]+self.oradius*(cos(self.startangle)), self.center[1]-self.oradius*(sin(self.startangle))), (self.center[0]+self.iradius*(cos(self.startangle)), self.center[1]-self.iradius*(sin(self.startangle))), 2)
+        pygame.draw.line(surface, self.fillcolor, (self.center[0]+self.oradius*(cos(self.endangle)), self.center[1]-self.oradius*(sin(self.endangle))), (self.center[0]+self.iradius*(cos(self.endangle)), self.center[1]-self.iradius*(sin(self.endangle))), 4)
+        pygame.draw.arc(surface, self.fillcolor, pygame.Rect(self.box.topleft, (2*self.oradius, 2*self.oradius)), self.startangle, self.endangle+pi/72, 3)
+        pygame.draw.arc(surface, self.fillcolor, pygame.Rect(self.box.topleft[0]+(self.oradius-self.iradius), self.box.topleft[1]+(self.oradius-self.iradius), 2*self.iradius, 2*self.iradius), self.startangle, self.endangle + pi/72, 3)
+        #pygame.draw.rect (surface, LINECOLOR, self.box, 1)
             
 
 
@@ -100,12 +100,14 @@ class EnvironBox():
                     stack.loc = i.expand1
                     for k in self.environlist[i.number:]:
                         k.shiftdown1
+                    return i.number
 #        self.lastangle = self.lastangle + UNITANGLE
         
     def update(self, stacklist):
         #self.envarc.collidelist(stacklist)
         for i in self.environlist:
             i.center = self.planet.center
+            i.box.center = i.center
             ret = i.update(stacklist)
             if (ret != 0):
                 for j in range(0, ret):
