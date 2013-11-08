@@ -19,7 +19,7 @@ class Environ():
         self.resources = resources
         self.creature = creature
         self.politics = politics
-        self.startangle = STARTANGLE+(self.number)
+        self.startangle = STARTANGLE+(self.number*UNITANGLE)
         self.endangle = self.startangle + UNITANGLE
         self.iradius = iradius
         self.oradius = oradius

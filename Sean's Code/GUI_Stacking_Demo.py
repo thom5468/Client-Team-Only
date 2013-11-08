@@ -55,7 +55,7 @@ def main():
     starsystem = System('star system', planets, starbg, animate)
     environment = environs.EnvironBox(earth.rect)
     environment.addEnviron(1, 'W', 4, "Humans", 4, "Animals", 'C' )
-    environment.environlist[0].expand1()
+    #environment.environlist[0].expand1()
     environment.addEnviron(2, 'U', 4, "Humans", 4, "Animals", 'C' )
     #environment.environlist[1].shiftdown1()
     environment.addEnviron(3, 'F', 3, "H", 2, "A", 'A')
