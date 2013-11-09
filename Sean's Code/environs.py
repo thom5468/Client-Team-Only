@@ -60,6 +60,8 @@ class Environ():
             for point in self.collidepoints:
                 if stack.rect.collidepoint(point):
                     self.total = self.total + 1
+                else:
+                    stacklist.remove(stack)
         for i in range(self.stacks-self.total):
             if i > 0:
                 self.contract1();
@@ -87,6 +89,7 @@ class EnvironBox():
         self.planet = planetrect
         self.environlist = []
         self.envarc = pygame.Rect(planetrect.topleft[0] - 75, planetrect.topleft[1] - 75, planetrect.width + 150, planetrect.height + 150)
+        self.stacklist = []
 #        self.firstangle = 2*pi/3
 #        self.lastangle = 2*pi/3
         
@@ -97,18 +100,19 @@ class EnvironBox():
         for i in self.environlist:
             for j in i.collidepoints:
                 if (stack.rect.collidepoint(j)):
+                    self.stacklist.append(stack)
                     stack.loc = i.expand1
                     for k in self.environlist[i.number:]:
                         k.shiftdown1
                     return i.number
 #        self.lastangle = self.lastangle + UNITANGLE
         
-    def update(self, stacklist):
+    def update(self):
         #self.envarc.collidelist(stacklist)
         for i in self.environlist:
             i.center = self.planet.center
             i.box.center = i.center
-            ret = i.update(stacklist)
+            ret = i.update(self.stacklist)
             if (ret != 0):
                 for j in range(0, ret):
                     for k in self.environlist[i.number:]:

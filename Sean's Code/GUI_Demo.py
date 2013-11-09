@@ -2,6 +2,7 @@
 import os
 import sys
 import pygame
+import environs
 
 pygame.init()
 
@@ -178,6 +179,7 @@ def main():
                 controls.add(mouseptr)
 
         # Update where the ships are in relation to planets; update controls and selection movement
+        planets.update()
         rebelships.update()
         controls.update()
         selection.update(mouse_update, animate)
@@ -185,6 +187,8 @@ def main():
         # Refresh the screen
         screen.blit(starbg, (0, 0))
         planets.draw(screen)
+        for planet in planets.sprites():
+            planet.environment.draw(screen)
         rebelships.draw(screen)
         for stack in unitstack.list:
             stack.draw(screen)
@@ -380,6 +384,10 @@ class Planet(pygame.sprite.Sprite):
         self.rect.center = self.pos
         self.colliderect = self.rect.inflate(-50, -50)
         self.colliderect.normalize()
+        self.environment = environs.EnvironBox(self.rect)
+        self.environment.addEnviron(1, 'W', 4, "Humans", 4, "Animals", 'C' )
+        self.environment.addEnviron(2, 'U', 4, "Humans", 4, "Animals", 'C' )
+        self.environment.addEnviron(3, 'F', 3, "H", 2, "A", 'A')
 
     def update(self, movedir=None, animate=None):  # Update planet orientation
         self.porient = self.orient
@@ -412,6 +420,8 @@ class Planet(pygame.sprite.Sprite):
         else:
             self.rect.center = self.pos
             self.colliderect.center = self.pos
+        self.environment.update()
+           
 
 
 class Ship(pygame.sprite.Sprite):
