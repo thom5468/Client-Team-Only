@@ -558,6 +558,9 @@ def unit_unselect_check(unitlist, planetlist, mouse, prev_pos, prev_loc, selecti
         if unitstack.has(unit):
             print 'UNSELECTING STACK'  # Testing
             for planet in planetlist:
+                if planet.environment.addstack(unitstack) != 0:
+                    selectionlist.empty()
+                    return True
                 if planet.rect.collidepoint(mouse.pos):
                     print 'STACK LANDING ON:', planet.name  # Testing
                     unitstack.update(unit, planet.colliderect)
@@ -572,6 +575,9 @@ def unit_unselect_check(unitlist, planetlist, mouse, prev_pos, prev_loc, selecti
             if _unit_stack_check(unitlist, unit, selectionlist, unitstack):
                     return True
             for planet in planetlist:
+                if planet.environment.addstack(unitstack) != 0:
+                    selectionlist.empty()
+                    return True
                 if planet.rect.collidepoint(mouse.pos):
                     print 'SINGLE LANDING ON:', planet.name  # Testing
                     unit.loc = planet.colliderect  # set the location of the ship to the planet !!

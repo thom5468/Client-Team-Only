@@ -101,7 +101,7 @@ class EnvironBox():
             for j in i.collidepoints:
                 if (stack.rect.collidepoint(j)):
                     self.stacklist.append(stack)
-                    stack.loc = i.expand1
+                    stack.update( i.expand1)
                     for k in self.environlist[i.number:]:
                         k.shiftdown1
                     return i.number
