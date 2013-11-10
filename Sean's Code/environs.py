@@ -99,7 +99,7 @@ class EnvironBox():
     def addstack (self, stack):
         for i in self.environlist:
             for j in i.collidepoints:
-                if (stack.rect.collidepoint(j)):
+                if (stack.get_top_sprite().rect.collidepoint(j)):
                     self.stacklist.append(stack)
                     stack.update( i.expand1)
                     for k in self.environlist[i.number:]:
