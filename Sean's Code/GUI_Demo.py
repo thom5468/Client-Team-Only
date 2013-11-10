@@ -3,267 +3,261 @@ import os
 import sys
 import pygame
 import environs
-import threading
 
 pygame.init()
 
 #Global notification log stack
 LogStack = []
-class GUI (threading.Thread):
-    def __init__ (self):
-        self.clock = pygame.time.Clock()
-        self.screensize = (1024, 800)
-        self.screen = pygame.display.set_mode(self.screensize)
-        self.starbg = pygame.image.load("stars.jpg")
-        self.starbg = pygame.transform.scale(self.starbg, (self.screensize))
-        pygame.mouse.set_visible(0)
 
-        self.screen.blit(self.starbg, (0, 0))
-        mouseptr = MouseCursor('pointer2.png')
-        mousesel = MouseCursor('selected2.png')
-        self.controls = pygame.sprite.RenderUpdates((mouseptr))
-        self.controls.draw(self.screen)
-        pygame.display.flip()
-
-        #===========================================================================
-        # Game Control Handling:
-        #===========================================================================
-        self.selection = pygame.sprite.LayeredUpdates(())
-        self.unitstack = Stack()
-        self.animate = True
-        self.mouse_update = False
-        self.prev_pos = None
-        self.prev_loc = None
-
-        #===========================================================================
-        # Object Initialization:
-        #===========================================================================
-        self.purple = Planet('purple', 'purple_planet.png', 'left')
-        self.earth = Planet('earth', 'earth_planet.png', 'center')
-        self.blue = Planet('blue', 'blue_planet.png', 'right')
-        self.cis = Ship('cis', 'rebel_cis.jpg', (100, 200))
-        self.megathron = Ship('megathron', 'rebel_megathron.jpg', (100, 250))
-        self.vagabond1 = Ship('vagabond', 'imperial_vagabond.jpg', (100, 500))
-        self.vagabond2 = Ship('vagabond', 'imperial_vagabond.jpg', (250, 600))
-        self.viper = Ship('viper', 'imperial_viper.jpg', (400, 500))
-
-        self.planets = pygame.sprite.LayeredUpdates((self.earth, self.purple, self.blue))
-        #imperialships = pygame.sprite.LayeredUpdates((vagabond1, vagabond2))
-        self.rebelships = pygame.sprite.LayeredUpdates((self.cis, self.megathron, self.viper, self.vagabond1, self.vagabond2))
-
-        self.starsystem = System('star system', self.planets, self.starbg, self.animate)
-        
-        #Buttons
-        self.LogFlag = False
-        self.DetailsFlag = False
-        self.MissionFlag = False
-        self.HelpFlag = False
-        self.LogButton = Button()
-        self.CloseLogButton = Button()
-        self.DetailsButton = Button()
-        self.CloseDetailsButton = Button()
-        self.MissionButton = Button()
-        self.CloseMissionButton = Button()
-        self.HelpButton = Button()
-        self.CloseHelpButton = Button()
-        #Mission Buttons
-        self.MissionCoup = Button()
-        self.MissionGI = Button()
-        self.MissionDip = Button()
-        self.MissionAssas = Button()
-        self.MissionSubvert = Button()
-        self.MissionScavenge = Button()
-        self.MissionCamp = Button()
-        self.MissionRebelion = Button()
-        #Initialize the hidden buttons
-        self.CloseLogButton.create_button(self.screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
-        self.CloseDetailsButton.create_button(self.screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
-        self.CloseMissionButton.create_button(self.screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
-        self.CloseHelpButton.create_button(self.screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
-        self.MissionCoup.create_button(self.screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
-        self.MissionGI.create_button(self.screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
-        self.MissionDip.create_button(self.screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
-        self.MissionAssas.create_button(self.screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
-        self.MissionSubvert.create_button(self.screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
-        self.MissionScavenge.create_button(self.screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
-        self.MissionCamp.create_button(self.screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
-        self.MissionRebelion.create_button(self.screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
-        threading.Thread.__init__(self)
-        
-    def run(self):
-        while True:
-            self.clock.tick(60)
-            
-            #=======================================================================
-            # Event Handling:
-            #=======================================================================
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    sys.exit()
-                if not mouseptr.down:
-                    if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                        print 'PRINTING UNIT STACK:'  # Testing
-                        for sprite_group in self.unitstack.list:
-                            print sprite_group
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        if event.button == 1:
-                            mouseptr.pressed = mousesel.pressed = True
-                            mouseptr.released = mousesel.released = False
-                            # check to see if anything has been selected
-                            mouse_update, prev_pos, prev_loc = select_check(rebelships, planets, mouseptr, self.selection, self.unitstack)
-                            # while the mouse button is down, change its cursor
-                            self.controls.remove(mouseptr)
-                            self.controls.add(mousesel)
-                        elif event.button == 3:
-                            key_mod = pygame.key.get_mods()
-                            if key_mod == 4097 or key_mod == 1:
-                                left_select_check(rebelships, mouseptr, self.selection, self.unitstack, True)
-                            else:
-                                left_select_check(rebelships, mouseptr, self.selection, self.unitstack, False)
-                                
-                        #If the self.Log button is pressed, then display the window
-                        if self.LogButton.pressed(pygame.mouse.get_pos()):
-                            self.LogFlag = True
-                        elif self.CloseLogButton.pressed(pygame.mouse.get_pos()):
-                            self.LogFlag = False
-                        elif self.DetailsButton.pressed(pygame.mouse.get_pos()):
-                            self.DetailsFlag = True
-                        elif self.CloseDetailsButton.pressed(pygame.mouse.get_pos()):
-                            self.DetailsFlag = False
-                        elif self.HelpButton.pressed(pygame.mouse.get_pos()):
-                            self.HelpFlag = True
-                        elif self.CloseHelpButton.pressed(pygame.mouse.get_pos()):
-                            self.HelpFlag = False    		
-                        elif self.MissionButton.pressed(pygame.mouse.get_pos()):
-                            self.MissionFlag = True
-                        elif self.CloseMissionButton.pressed(pygame.mouse.get_pos()):
-                            self.MissionFlag = False   
-                        elif self.MissionCoup.pressed(pygame.mouse.get_pos()):
-                            #Send off request to Backend
-                            self.LogStack.insert(0,"Coup Mission Selected")
-                        elif self.MissionGI.pressed(pygame.mouse.get_pos()):
-                            #Send off request to Backend
-                            self.LogStack.insert(0,"Gather Information Mission Selected")
-                        elif self.MissionDip.pressed(pygame.mouse.get_pos()):
-                            #Send off request to Backend
-                            self.LogStack.insert(0,"Diplomacy Mission Selected")
-                        elif self.MissionAssas.pressed(pygame.mouse.get_pos()):
-                            #Send off request to Backend
-                            self.LogStack.insert(0,"Assasination Mission Selected")
-                        elif self.MissionSubvert.pressed(pygame.mouse.get_pos()):
-                            #Send off request to Backend
-                            self.LogStack.insert(0,"Subvert Troops Mission Selected")
-                        elif self.MissionScavenge.pressed(pygame.mouse.get_pos()):
-                            #Send off request to Backend
-                            self.LogStack.insert(0,"Scavenge Mission Selected")
-                        elif self.MissionCamp.pressed(pygame.mouse.get_pos()):
-                            #Send off request to Backend
-                            self.LogStack.insert(0,"Start Rebel Camp Mission Selected")
-                        elif self.MissionRebelion.pressed(pygame.mouse.get_pos()):
-                            #Send off request to Backend
-                            self.LogStack.insert(0,"Start/Stop Rebelion Mission Selected")
-                        
-
-                if event.type == pygame.MOUSEBUTTONUP:
-                    mouseptr.released = mousesel.released = True
-                    # check to see if something was selected
-                    if self.mouse_update and self.prev_pos is None:  # planet was selected
-                        self.starsystem.planet_move(self.selection)
-                    elif self.mouse_update:  # a unit was selected
-                        unit_unselect_check(self.rebelships, self.planets, mousesel, self.prev_pos, self.prev_loc, self.selection, self.unitstack)
-                    self.mouse_update = False
-                    # while the mouse button is up, change its cursor
-                    self.controls.remove(mousesel)
-                    self.controls.add(mouseptr)
-
-            # Update where the ships are in relation to planets; update self.controls and self.selection movement
-            self.planets.update()
-            self.rebelships.update()
-            self.controls.update()
-            self.selection.update(self.mouse_update, self.animate)
-
-            # Refresh the screen
-            self.screen.blit(self.starbg, (0, 0))
-            self.planets.draw(self.screen)
-            for planet in self.planets.sprites():
-                planet.environment.draw(self.screen)
-            self.rebelships.draw(self.screen)
-            for stack in self.unitstack.list:
-                stack.draw(self.screen)
-            #self.unitstack.draw(self.screen) # Not working as intended
-            self.selection.draw(self.screen)
-            
-            #Draw menus and buttons based off of flag values
-            if(self.LogFlag == True):
-                #If self.LogFlag is set, then display the text window
-                #Format the output string
-                if(len(self.LogStack) > 10):
-                    self.LogStack.pop()
-                self.Log_Message = ""    
-                for item in self.LogStack:
-                    self.Log_Message = self.Log_Message + str(item)+"\n"
-                self.log_font = pygame.font.Font(None, 15)
-                self.Log_rect = pygame.Rect((0, 650, 300, 150))
-                rendered_text = render_textrect(self.Log_Message, self.Log_font, self.Log_rect, (216, 216, 216), (48, 48, 48), 0)
-                self.screen.blit(rendered_text, self.Log_rect.topleft)
-                #Parameters:                 surface, color,       x,   y,  length, height, width, text,  text_color
-                self.CloseLogButton.create_button(self.screen, (255, 0, 0), 285,  655,    10,    10,   10,    "X", (0, 0, 0))
-            else:
-                self.LogButton.create_button(self.screen, (0, 255, 0), 10,  750,  100,  30,   0,  "Log   ", (255,255,255))
-            if(self.DetailsFlag == True):
-                self.details_rect = pygame.Rect((724, 650, 300, 150))
-                pygame.draw.rect(self.screen,(48, 48, 48),details_rect )
-                self.details_sub_rect = pygame.Rect((724, 635, 300, 135))
-                self.detailScreen = self.screen.subsurface(details_sub_rect)
-                self.tmpSel = self.selection.sprites()
-                
-                #details_font = pygame.font.Font(None, 20)
-                #rendered_text = render_textrect("Details Placeholder", details_font, details_rect, (216, 216, 216), (48, 48, 48), 0)
-                #self.screen.blit(rendered_text, details_rect.midtop)
-                #Parameters:                     surface, color,       x,   y,   length, height, width, text,       text_color
-                self.CloseDetailsButton.create_button(self.screen, (255, 0, 0), 1010,  655,    10,    10,   10,    "X", (0, 0, 0))
-            else:
-                self.DetailsButton.create_button(self.screen, (0, 255, 0), 900,  750,    100,    30,   0,  "Details", (255,255,255))
-            if(self.MissionFlag == True):
-                self.mission_rect = pygame.Rect((330,650,350,150))
-                pygame.draw.rect(self.screen,(48, 48, 48),self.mission_rect )
-                #Draw the mission select buttons
-                #Parameters:              surface, color,       x,   y,   length, height, width, text,       text_color
-                self.MissionCoup.create_button(self.screen, (0, 255, 0), 340,  665,    100,    30,   0,  "Coup   ", (255,255,255))
-                self.MissionGI.create_button(self.screen, (0, 255, 0), 455,  665,    100,    30,   0,  "Gather Info", (255,255,255))
-                self.MissionDip.create_button(self.screen, (0, 255, 0), 565,  665,    100,    30,   0,  "Diplomacy", (255,255,255))
-                self.MissionAssas.create_button(self.screen, (0, 255, 0), 340,  715,    100,    30,   0,  "Assasination", (255,255,255))
-                self.MissionSubvert.create_button(self.screen, (0, 0, 255), 455,  715,    100,    30,   0,  "Subvert ", (255,255,255))
-                self.MissionScavenge.create_button(self.screen, (0, 0, 255), 565,  715,    100,    30,   0,  "Scavenge", (255,255,255))
-                self.MissionCamp.create_button(self.screen, (0, 0, 255), 340,  755,    100,    30,   0,  "Start Camp", (255,255,255))
-                self.MissionRebelion.create_button(self.screen, (0, 255, 0), 455,  755,    210,    30,   0,  "Start/Stop Rebelion", (255,255,255))
-                self.CloseMissionButton.create_button(self.screen, (255, 0, 0), 665,  655,    10,    10,   10,    "X", (0, 0, 0))
-            else:
-                self.MissionButton.create_button(self.screen, (0, 255, 0), 475,  745,    100,    30,   20,  "Missions", (255,255,255))
-            if(self.HelpFlag == True):
-                self.Help_Message = "This text will change based on the current player phase" 
-                self.help_bg = pygame.Rect((0,0,300,30))
-                self.pygame.draw.rect(self.screen,(48, 48, 48),help_bg)   
-                self.help_font = pygame.font.Font(None, 15)
-                self.help_rect = pygame.Rect((0, 20, 300, 280))
-                self.rendered_text = render_textrect(self.Help_Message, self.help_font, self.help_rect, (216, 216, 216), (48, 48, 48), 0)
-                self.screen.blit(self.rendered_text, help_rect.topleft)
-                #Parameters:                 surface, color,       x,   y,  length, height, width, text,  text_color
-                self.CloseHelpButton.create_button(self.screen, (255, 0, 0), 285,  5,    10,    10,   10,    "X", (0, 0, 0))
-            else:
-                self.HelpButton.create_button(self.screen, (0, 255, 0), 5,  5,  100,  30,   0,  "Help  ", (255,255,255))
-            
-            self.controls.draw(self.screen)
-
-            pygame.display.flip()
-		
 def main():
-    interface = GUI()
-    interface.start()
+    clock = pygame.time.Clock()
+
+    screensize = (1024, 800)
+    screen = pygame.display.set_mode(screensize)
+    starbg = pygame.image.load("stars.jpg")
+    starbg = pygame.transform.scale(starbg, (screensize))
+    pygame.mouse.set_visible(0)
+
+    screen.blit(starbg, (0, 0))
+    mouseptr = MouseCursor('pointer2.png')
+    mousesel = MouseCursor('selected2.png')
+    controls = pygame.sprite.RenderUpdates((mouseptr))
+    controls.draw(screen)
+    pygame.display.flip()
+
+    #===========================================================================
+    # Game Control Handling:
+    #===========================================================================
+    selection = pygame.sprite.LayeredUpdates(())
+    unitstack = Stack()
+    animate = True
+    mouse_update = False
+    prev_pos = None
+    prev_loc = None
+
+    #===========================================================================
+    # Object Initialization:
+    #===========================================================================
+    purple = Planet('purple', 'purple_planet.png', 'left')
+    earth = Planet('earth', 'earth_planet.png', 'center')
+    blue = Planet('blue', 'blue_planet.png', 'right')
+    cis = Ship('cis', 'rebel_cis.jpg', (100, 200))
+    megathron = Ship('megathron', 'rebel_megathron.jpg', (100, 250))
+    vagabond1 = Ship('vagabond', 'imperial_vagabond.jpg', (100, 500))
+    vagabond2 = Ship('vagabond', 'imperial_vagabond.jpg', (250, 600))
+    viper = Ship('viper', 'imperial_viper.jpg', (400, 500))
+
+    planets = pygame.sprite.LayeredUpdates((earth, purple, blue))
+    #imperialships = pygame.sprite.LayeredUpdates((vagabond1, vagabond2))
+    rebelships = pygame.sprite.LayeredUpdates((cis, megathron, viper, vagabond1, vagabond2))
+
+    starsystem = System('star system', planets, starbg, animate)
+	
+	#Buttons
+    LogFlag = False
+    DetailsFlag = False
+    MissionFlag = False
+    HelpFlag = False
+    LogButton = Button()
+    CloseLogButton = Button()
+    DetailsButton = Button()
+    CloseDetailsButton = Button()
+    MissionButton = Button()
+    CloseMissionButton = Button()
+    HelpButton = Button()
+    CloseHelpButton = Button()
+    #Mission Buttons
+    MissionCoup = Button()
+    MissionGI = Button()
+    MissionDip = Button()
+    MissionAssas = Button()
+    MissionSubvert = Button()
+    MissionScavenge = Button()
+    MissionCamp = Button()
+    MissionRebelion = Button()
+    #Initialize the hidden buttons
+    CloseLogButton.create_button(screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
+    CloseDetailsButton.create_button(screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
+    CloseMissionButton.create_button(screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
+    CloseHelpButton.create_button(screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
+    MissionCoup.create_button(screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
+    MissionGI.create_button(screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
+    MissionDip.create_button(screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
+    MissionAssas.create_button(screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
+    MissionSubvert.create_button(screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
+    MissionScavenge.create_button(screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
+    MissionCamp.create_button(screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
+    MissionRebelion.create_button(screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
+
+    while 1:
+        clock.tick(60)
+        
+        #=======================================================================
+        # Event Handling:
+        #=======================================================================
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                pygame.quit()
+                sys.exit()
+            if not mouseptr.down:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    print 'PRINTING UNIT STACK:'  # Testing
+                    for sprite_group in unitstack.list:
+                        print sprite_group
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        mouseptr.pressed = mousesel.pressed = True
+                        mouseptr.released = mousesel.released = False
+                        # check to see if anything has been selected
+                        mouse_update, prev_pos, prev_loc = select_check(rebelships, planets, mouseptr, selection, unitstack)
+                        # while the mouse button is down, change its cursor
+                        controls.remove(mouseptr)
+                        controls.add(mousesel)
+                    elif event.button == 3:
+                        key_mod = pygame.key.get_mods()
+                        if key_mod == 4097 or key_mod == 1:
+                            left_select_check(rebelships, mouseptr, selection, unitstack, True)
+                        else:
+                            left_select_check(rebelships, mouseptr, selection, unitstack, False)
+                            
+					#If the Log button is pressed, then display the window
+                    if LogButton.pressed(pygame.mouse.get_pos()):
+                        LogFlag = True
+                    elif CloseLogButton.pressed(pygame.mouse.get_pos()):
+                        LogFlag = False
+                    elif DetailsButton.pressed(pygame.mouse.get_pos()):
+                        DetailsFlag = True
+                    elif CloseDetailsButton.pressed(pygame.mouse.get_pos()):
+                        DetailsFlag = False
+                    elif HelpButton.pressed(pygame.mouse.get_pos()):
+                        HelpFlag = True
+                    elif CloseHelpButton.pressed(pygame.mouse.get_pos()):
+                        HelpFlag = False    		
+                    elif MissionButton.pressed(pygame.mouse.get_pos()):
+                        MissionFlag = True
+                    elif CloseMissionButton.pressed(pygame.mouse.get_pos()):
+                        MissionFlag = False   
+                    elif MissionCoup.pressed(pygame.mouse.get_pos()):
+                        #Send off request to Backend
+                        LogStack.insert(0,"Coup Mission Selected")
+                    elif MissionGI.pressed(pygame.mouse.get_pos()):
+                        #Send off request to Backend
+                        LogStack.insert(0,"Gather Information Mission Selected")
+                    elif MissionDip.pressed(pygame.mouse.get_pos()):
+                        #Send off request to Backend
+                        LogStack.insert(0,"Diplomacy Mission Selected")
+                    elif MissionAssas.pressed(pygame.mouse.get_pos()):
+                        #Send off request to Backend
+                        LogStack.insert(0,"Assasination Mission Selected")
+                    elif MissionSubvert.pressed(pygame.mouse.get_pos()):
+                        #Send off request to Backend
+                        LogStack.insert(0,"Subvert Troops Mission Selected")
+                    elif MissionScavenge.pressed(pygame.mouse.get_pos()):
+                        #Send off request to Backend
+                        LogStack.insert(0,"Scavenge Mission Selected")
+                    elif MissionCamp.pressed(pygame.mouse.get_pos()):
+                        #Send off request to Backend
+                        LogStack.insert(0,"Start Rebel Camp Mission Selected")
+                    elif MissionRebelion.pressed(pygame.mouse.get_pos()):
+                        #Send off request to Backend
+                        LogStack.insert(0,"Start/Stop Rebelion Mission Selected")
+					
+
+            if event.type == pygame.MOUSEBUTTONUP:
+                mouseptr.released = mousesel.released = True
+                # check to see if something was selected
+                if mouse_update and prev_pos is None:  # planet was selected
+                    starsystem.planet_move(selection)
+                elif mouse_update:  # a unit was selected
+                    unit_unselect_check(rebelships, planets, mousesel, prev_pos, prev_loc, selection, unitstack)
+                mouse_update = False
+                # while the mouse button is up, change its cursor
+                controls.remove(mousesel)
+                controls.add(mouseptr)
+
+        # Update where the ships are in relation to planets; update controls and selection movement
+        planets.update()
+        rebelships.update()
+        controls.update()
+        selection.update(mouse_update, animate)
+
+        # Refresh the screen
+        screen.blit(starbg, (0, 0))
+        planets.draw(screen)
+        for planet in planets.sprites():
+            planet.environment.draw(screen)
+        rebelships.draw(screen)
+        for stack in unitstack.list:
+            stack.draw(screen)
+        #unitstack.draw(screen) # Not working as intended
+        selection.draw(screen)
+        
+        #Draw menus and buttons based off of flag values
+        if(LogFlag == True):
+            #If LogFlag is set, then display the text window
+            #Format the output string
+            if(len(LogStack) > 10):
+                LogStack.pop()
+            Log_Message = ""    
+            for item in LogStack:
+                Log_Message = Log_Message + str(item)+"\n"
+            log_font = pygame.font.Font(None, 15)
+            log_rect = pygame.Rect((0, 650, 300, 150))
+            rendered_text = render_textrect(Log_Message, log_font, log_rect, (216, 216, 216), (48, 48, 48), 0)
+            screen.blit(rendered_text, log_rect.topleft)
+            #Parameters:                 surface, color,       x,   y,  length, height, width, text,  text_color
+            CloseLogButton.create_button(screen, (255, 0, 0), 285,  655,    10,    10,   10,    "X", (0, 0, 0))
+        else:
+            LogButton.create_button(screen, (0, 255, 0), 10,  750,  100,  30,   0,  "Log   ", (255,255,255))
+        if(DetailsFlag == True):
+            details_rect = pygame.Rect((724, 650, 300, 150))
+            pygame.draw.rect(screen,(48, 48, 48),details_rect )
+            details_sub_rect = pygame.Rect((724, 635, 300, 135))
+            detailScreen = screen.subsurface(details_sub_rect)
+            tmpSel = selection.sprites()
+            
+            #details_font = pygame.font.Font(None, 20)
+            #rendered_text = render_textrect("Details Placeholder", details_font, details_rect, (216, 216, 216), (48, 48, 48), 0)
+            #screen.blit(rendered_text, details_rect.midtop)
+            #Parameters:                     surface, color,       x,   y,   length, height, width, text,       text_color
+            CloseDetailsButton.create_button(screen, (255, 0, 0), 1010,  655,    10,    10,   10,    "X", (0, 0, 0))
+        else:
+            DetailsButton.create_button(screen, (0, 255, 0), 900,  750,    100,    30,   0,  "Details", (255,255,255))
+        if(MissionFlag == True):
+            mission_rect = pygame.Rect((330,650,350,150))
+            pygame.draw.rect(screen,(48, 48, 48),mission_rect )
+            #Draw the mission select buttons
+            #Parameters:              surface, color,       x,   y,   length, height, width, text,       text_color
+            MissionCoup.create_button(screen, (0, 255, 0), 340,  665,    100,    30,   0,  "Coup   ", (255,255,255))
+            MissionGI.create_button(screen, (0, 255, 0), 455,  665,    100,    30,   0,  "Gather Info", (255,255,255))
+            MissionDip.create_button(screen, (0, 255, 0), 565,  665,    100,    30,   0,  "Diplomacy", (255,255,255))
+            MissionAssas.create_button(screen, (0, 255, 0), 340,  715,    100,    30,   0,  "Assasination", (255,255,255))
+            MissionSubvert.create_button(screen, (0, 0, 255), 455,  715,    100,    30,   0,  "Subvert ", (255,255,255))
+            MissionScavenge.create_button(screen, (0, 0, 255), 565,  715,    100,    30,   0,  "Scavenge", (255,255,255))
+            MissionCamp.create_button(screen, (0, 0, 255), 340,  755,    100,    30,   0,  "Start Camp", (255,255,255))
+            MissionRebelion.create_button(screen, (0, 255, 0), 455,  755,    210,    30,   0,  "Start/Stop Rebelion", (255,255,255))
+            CloseMissionButton.create_button(screen, (255, 0, 0), 665,  655,    10,    10,   10,    "X", (0, 0, 0))
+        else:
+            MissionButton.create_button(screen, (0, 255, 0), 475,  745,    100,    30,   20,  "Missions", (255,255,255))
+        if(HelpFlag == True):
+            Help_Message = "This text will change based on the current player phase" 
+            help_bg = pygame.Rect((0,0,300,30))
+            pygame.draw.rect(screen,(48, 48, 48),help_bg)   
+            help_font = pygame.font.Font(None, 15)
+            help_rect = pygame.Rect((0, 20, 300, 280))
+            rendered_text = render_textrect(Help_Message, help_font, help_rect, (216, 216, 216), (48, 48, 48), 0)
+            screen.blit(rendered_text, help_rect.topleft)
+            #Parameters:                 surface, color,       x,   y,  length, height, width, text,  text_color
+            CloseHelpButton.create_button(screen, (255, 0, 0), 285,  5,    10,    10,   10,    "X", (0, 0, 0))
+        else:
+            HelpButton.create_button(screen, (0, 255, 0), 5,  5,  100,  30,   0,  "Help  ", (255,255,255))
+        
+        controls.draw(screen)
+
+        pygame.display.flip()
 
 
 class MouseCursor(pygame.sprite.Sprite):
