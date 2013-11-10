@@ -90,7 +90,7 @@ def main():
     MissionRebelion.create_button(screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
 
     while 1:
-        clock.tick(60)
+        clock.tick(3)
         
         #=======================================================================
         # Event Handling:
@@ -188,7 +188,9 @@ def main():
         screen.blit(starbg, (0, 0))
         planets.draw(screen)
         for planet in planets.sprites():
-            planet.environment.draw(screen)
+            if planet.orient == 'center':
+                planet.environment.update()
+                planet.environment.draw(screen)
         rebelships.draw(screen)
         for stack in unitstack.list:
             stack.draw(screen)
@@ -420,7 +422,7 @@ class Planet(pygame.sprite.Sprite):
         else:
             self.rect.center = self.pos
             self.colliderect.center = self.pos
-        self.environment.update()
+        #self.environment.update()
            
 
 
@@ -558,7 +560,8 @@ def unit_unselect_check(unitlist, planetlist, mouse, prev_pos, prev_loc, selecti
         if unitstack.has(unit):
             print 'UNSELECTING STACK'  # Testing
             for planet in planetlist:
-                if planet.environment.addstack(unitstack) != 0:
+                if planet.environment.addstack(unit, unitstack) != 0:
+                    print 'LANDING ON ENVIRON'
                     selectionlist.empty()
                     return True
                 if planet.rect.collidepoint(mouse.pos):
@@ -575,7 +578,7 @@ def unit_unselect_check(unitlist, planetlist, mouse, prev_pos, prev_loc, selecti
             if _unit_stack_check(unitlist, unit, selectionlist, unitstack):
                     return True
             for planet in planetlist:
-                if planet.environment.addstack(unitstack) != 0:
+                if planet.environment.addstack(unit, unitstack) != 0:
                     selectionlist.empty()
                     return True
                 if planet.rect.collidepoint(mouse.pos):

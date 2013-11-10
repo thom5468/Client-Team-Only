@@ -25,10 +25,13 @@ class Environ():
         self.oradius = oradius
         self.averadius = (iradius+oradius)/2
         self.center = center
+        #print center
         #self.colliderect = pygame.Rect(,,,)
         self.getcolor(type)
         self.collidepoints = []
         self.updatepoints()
+    def __str__(self):
+        return str(self.number)
     def getcolor(self, type):
         self.fillcolor = ETcolors[type]
     def shiftdown1  (self):
@@ -42,7 +45,9 @@ class Environ():
     def expand1 (self):
         self.endangle = self.endangle + UNITANGLE
         self.updatepoints()
-        return self.collidepoints[-2]
+        print 'Expanding'
+        print self.collidepoints[-2]
+        return pygame.Rect(self.collidepoints[-2], (1,1))
     def contract1 (self):
         self.endangle = self.endangle - UNITANGLE
         #self.updatepoints()
@@ -51,33 +56,41 @@ class Environ():
         angle = self.startangle
         while angle < self.endangle:
             angle = angle + UNITANGLE/2
-            self.collidepoints.append((cos(angle)*(self.averadius+self.center[0]),sin(angle)*(self.averadius-self.center[1])))
-            angle = angle + UNITANGLE
+            self.collidepoints.append((int(self.center[0]+(cos(angle)*self.averadius)), int(self.center[1]-(sin(angle)*self.averadius))))
+            angle = angle + UNITANGLE/2
         self.stacks = len(self.collidepoints)
     def update (self, stacklist):
-        self.total = 1
+        self.total = self.stacks
         for stack in stacklist:
             for point in self.collidepoints:
-                if stack.rect.collidepoint(point):
-                    self.total = self.total + 1
-                else:
-                    stacklist.remove(stack)
+                for sprite in stack.sprites():
+                    if sprite.rect.collidepoint(point):
+                        self.total = self.total + 1
+                    else:
+                        self.total = self.total - 1
+                        #stacklist.remove(stack)
         for i in range(self.stacks-self.total):
             if i > 0:
                 self.contract1();
-        self.total = self.stacks - self.total
+        #print 'total: '+str(self.total)
+        #print 'stacks: '+str(self.stacks)
         self.updatepoints()
-        for stack in stacklist:
-            for point in self.collidepoints:
-                if stack.rect.collidepoint(point):
-                    stack.pos = point
-                    stack.update()
-        return self.total #amount of growth/shrinkage
+        #for stack in stacklist:
+        #    for point in self.collidepoints:
+        #        if stack.rect.collidepoint(point):
+        #            stack.pos = point
+        #            stack.update()
+        return self.stacks-self.total #amount of growth/shrinkage
     def draw (self, surface):
         pygame.draw.line(surface, self.fillcolor, (self.center[0]+self.oradius*(cos(self.startangle)), self.center[1]-self.oradius*(sin(self.startangle))), (self.center[0]+self.iradius*(cos(self.startangle)), self.center[1]-self.iradius*(sin(self.startangle))), 2)
         pygame.draw.line(surface, self.fillcolor, (self.center[0]+self.oradius*(cos(self.endangle)), self.center[1]-self.oradius*(sin(self.endangle))), (self.center[0]+self.iradius*(cos(self.endangle)), self.center[1]-self.iradius*(sin(self.endangle))), 4)
         pygame.draw.arc(surface, self.fillcolor, pygame.Rect(self.box.topleft, (2*self.oradius, 2*self.oradius)), self.startangle, self.endangle+pi/72, 3)
         pygame.draw.arc(surface, self.fillcolor, pygame.Rect(self.box.topleft[0]+(self.oradius-self.iradius), self.box.topleft[1]+(self.oradius-self.iradius), 2*self.iradius, 2*self.iradius), self.startangle, self.endangle + pi/72, 3)
+        for point in self.collidepoints:
+            #print 'point: '
+            #print point[0]
+            #print point[1]
+            pygame.draw.circle(surface, LINECOLOR, point, 5)
         #pygame.draw.rect (surface, LINECOLOR, self.box, 1)
             
 
@@ -96,15 +109,28 @@ class EnvironBox():
     def addEnviron(self, number, type, size, race, resources, creature, politics):
         self.environlist.append(Environ(self.planet.center, self.planet.width/2 + 50, self.planet.width/2 + 150, number, type, size, race, resources, creature, politics))
 
-    def addstack (self, stack):
+    def addstack (self, unit, stack):
         for i in self.environlist:
+            print 'Checking Environ: '+str(i)
             for j in i.collidepoints:
-                if (stack.rect.collidepoint(j)):
-                    self.stacklist.append(stack)
-                    stack.update( i.expand1)
-                    for k in self.environlist[i.number:]:
-                        k.shiftdown1
-                    return i.number
+                print 'Checking Collidepoint: '+str(j)
+                if (stack.has(unit)):
+                    if (stack.list[0].get_top_sprite().rect.collidepoint(j)):
+                        for spritegroup in stack.list:
+                            self.stacklist.append(spritegroup)
+                        stack.update( unit, i.expand1())
+                        for k in self.environlist[i.number:]:
+                            k.shiftdown1()
+                        return i.number
+                else:
+                    if (unit.rect.collidepoint(j)):
+                        for spritegroup in stack.list:
+                            self.stacklist.append(spritegroup)
+                        unit.update( i.expand1())
+                        for k in self.environlist[i.number:]:
+                            k.shiftdown1()
+                        return i.number
+        return 0
 #        self.lastangle = self.lastangle + UNITANGLE
         
     def update(self):
@@ -113,12 +139,13 @@ class EnvironBox():
             i.center = self.planet.center
             i.box.center = i.center
             ret = i.update(self.stacklist)
+            print 'return: '+str(ret)
             if (ret != 0):
                 for j in range(0, ret):
                     for k in self.environlist[i.number:]:
-                        if (j<0):
-                            k.shiftup1()
                         if (j>0):
+                            k.shiftup1()
+                        if (j<0):
                             k.shiftdown1()
 #        self.outsideArc = [self.rect, ARCCOLOR, self.rect, self.firstangle, self.lastangle]
 #        self.insideArc = [self.rect, ARCCOLOR, self.rect, self.firstangle, self.lastangle]
