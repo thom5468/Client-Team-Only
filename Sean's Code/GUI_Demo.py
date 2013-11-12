@@ -47,7 +47,6 @@ def main():
     vagabond1 = Ship('vagabond', 'imperial_vagabond.jpg', (100, 500))
     vagabond2 = Ship('vagabond', 'imperial_vagabond.jpg', (250, 600))
     viper = Ship('viper', 'imperial_viper.jpg', (400, 500))
-
     #imperialships = pygame.sprite.LayeredUpdates((vagabond1, vagabond2))
     rebelships = pygame.sprite.LayeredUpdates((cis, megathron, viper, vagabond1, vagabond2))
     planets = pygame.sprite.LayeredUpdates((earth, purple, blue))
@@ -107,7 +106,6 @@ def main():
                     if event.button == 1:
                         mouseptr.pressed = mousesel.pressed = True
                         mouseptr.released = mousesel.released = False
-
                         #=======================================================
                         # Joe's button flags
                         #=======================================================
@@ -141,17 +139,25 @@ def main():
 
         # Update where the ships are in relation to planets; update controls and selection movement
         planets.update()
-        rebelships.update()
+        rebelships.update(planets) # bullshit
         controls.update()
         selection.update(mouse_update, animate)
 
         # Refresh the screen
         screen.blit(starbg, (0, 0))
         planets.draw(screen)
+        
+        #=======================================================================
+        # This needs work
+        #=======================================================================
         for planet in planets.sprites():
-            if planet.orient == 'center':
-                planet.environment.update()
-                planet.environment.draw(screen)
+            #if planet.orient == 'center':
+            planet.environment.update()
+            planet.environment.draw(screen)
+        #=======================================================================
+        # This needs work
+        #=======================================================================
+        
         rebelships.draw(screen)
         for stack in unitstack.list:
             stack.draw(screen)
@@ -296,6 +302,10 @@ class Planet(pygame.sprite.Sprite):
         self.rect.center = self.pos
         self.colliderect = self.rect.inflate(-50, -50)
         self.colliderect.normalize()
+        #=======================================================================
+        # The environs will be populated by the backend - we'll need to expand
+        # the planet class to take more variables.
+        #=======================================================================
         self.environment = environs.EnvironBox(self.rect)
         self.environment.addEnviron(1, 'W', 4, "Humans", 4, "Animals", 'C' )
         self.environment.addEnviron(2, 'U', 4, "Humans", 4, "Animals", 'C' )
@@ -344,13 +354,19 @@ class Ship(pygame.sprite.Sprite):
         self.image, self.rect = load_image(image, -1)
         self.rect.center = self.pos
 
-    def update(self, selected=None, animate=None):  # ship animation will be added later
+    def update(self, bullshit, selected=None, animate=None):  # ship animation will be added later
         if selected:
             self.pos = pygame.mouse.get_pos()
             self.rect.center = self.pos
         else:
             try:
-                self.rect.clamp_ip(self.loc)
+                if self.pos[0] is 'x':
+                    #print 'HELLO'
+                    # get the information for the specified environ, then set the pos[0] and pos[1] according to the list of collidepopints
+                    move = bullshitfunction(bullshit, self.loc, self.pos)
+                    self.rect.center = move
+                else:
+                    self.rect.clamp_ip(self.loc)
             except:
                 #print 'WARNING:', self.name, 'is drifting - put it on a planet'
                 return
@@ -405,6 +421,7 @@ class Stack():
             if stack.has(unit):
                 self.refresh = True
                 for sprite in stack:
+                    sprite.pos = unit.pos # I call bullshit
                     sprite.loc = location
                     sprite.rect.clamp_ip(location)
 
@@ -420,6 +437,15 @@ class Stack():
         for stack in self.list:
             for collision in pygame.sprite.spritecollide(mouse, stack, False):
                 print collision.name
+
+
+def bullshitfunction(planetlist, planet_rect, location_list):
+    #print 'KNEE DEEP IN SHIT'
+    for planet in planetlist:
+        if planet.rect.center == planet_rect.center:
+            for environment in planet.environment.environlist:
+                if environment.number == location_list[1]:
+                    return environment.collidepoints[location_list[2]]
 
 
 # Will be added to the mouse class
@@ -468,8 +494,12 @@ def unit_unselect_check(unitlist, planetlist, mouse, prev_pos, prev_loc, selecti
         if unitstack.has(unit):
             print 'UNSELECTING STACK'  # Testing
             for planet in planetlist:
-                if planet.environment.addstack(unit, unitstack) != 0:
-                    print 'LANDING ON ENVIRON'
+                #===============================================================
+                # This needs work
+                #===============================================================
+                if planet.environment.addunits(selectionlist):
+                    'STACK LANDING ON ENVIRON:'
+                    unitstack.update(unit, planet.colliderect)
                     selectionlist.empty()
                     return True
                 if planet.rect.collidepoint(mouse.pos):
@@ -486,7 +516,12 @@ def unit_unselect_check(unitlist, planetlist, mouse, prev_pos, prev_loc, selecti
             if _unit_stack_check(unitlist, unit, selectionlist, unitstack):
                     return True
             for planet in planetlist:
-                if planet.environment.addstack(unit, unitstack) != 0:
+                #===============================================================
+                # This needs work
+                #===============================================================
+                if planet.environment.addunits(selectionlist):
+                    'SINGLE LANDING ON ENVIRON:'
+                    unitlist.add(unit)
                     selectionlist.empty()
                     return True
                 if planet.rect.collidepoint(mouse.pos):
