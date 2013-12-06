@@ -14,7 +14,7 @@ import buttons
 pygame.init()
 
 
-def main():
+def main(setupinfo):
     screensize = (1024, 720)
     screen = pygame.display.set_mode(screensize)
     clock = pygame.time.Clock()
@@ -96,13 +96,16 @@ def left_mouse_unselect_check(mouse, selected_unit, star_system):
     if selected_unit:
         for planet in star_system.planet_list:
             if planet.collide_rect.colliderect(selected_unit.rect):
+                #response = client.root.move(stack_id=selected_unit.id, game_name=gamename, location_id=(star_system.id * 10 + planet.id) * 10)
                 selected_unit.loc_id = (star_system.id * 10 + planet.id) * 10
                 return None
             for environ in planet.environment.environ_list:
                 for point in environ.collision_points:
                     if selected_unit.rect.colliderect(pygame.Rect((point), (10, 10))):
+                        #response = client.root.move(stack_id=selected_unit.id, game_name=gamename, location_id=(star_system.id * 10 + planet.id) * 10 + environ.id)
                         selected_unit.loc_id = (star_system.id * 10 + planet.id) * 10 + environ.id
                         return None
+        ##process response
 
 
 class System():
@@ -284,11 +287,64 @@ class Planet(pygame.sprite.Sprite):
         else:
             self.rect.center = self.pos
             self.collide_rect.center = self.pos
-
-
+'''
+class Stack():
+    def __init__(self, stack_id, stack_location_id, unitlist, unit_ids)
+        self.id = stack_id
+        self.loc_id = stack_location_id
+        self.unitlist = unitlist
+        self.unitids = unit_ids
+        self.units = pygame.sprite.LayeredDirty(unitlist)
+        self.units.empty()
+        self.setattributes()
+        self.pos = None
+        self.loc = None
+        self.rect = None
+        
+    def setattributes(self):
+        self.ppos = self.pos
+        self.pos = units[0].pos
+        self.ploc = self.loc
+        self.loc = units[0].loc
+        self.prect = self.rect
+        self.rect = units[0].rect
+    
+    def updateunits(self, unit_ids):
+        for unit in self.units:
+            if not unit_ids.contains(unit.id):
+                self.units.remove(unit)
+        for id in unit_ids:
+            for unit in self.unitlist:
+                if unit.id == id:
+                    if not self.units.has(unit)
+                        self.units.add(unit)
+            
+    def cascadechanges(self):
+        if self.prect is not self.rect:
+            self.prect = self.rect
+            self.rect = units[0].rect
+        if self.ppos is not self.pos:
+            self.ppos = self.pos
+            for unit in self.units
+                unit.pos = self.pos
+        if self.ploc is not self.loc:
+            self.ploc = self.loc
+            for unit in self.units:
+                unit.loc = self.loc
+            
+    def update(self, unit_ids = self.unitids):
+        self.updateunits(unit_ids)
+        self.setattributes()
+        self.cascadechanges()
+        
+    def draw(screen):
+        self.units.draw()           
+    
+'''
 class Unit(pygame.sprite.DirtySprite):
     def __init__(self, unit_name, unit_location_id, image):
         self.name = unit_name
+        self.id = 1
         self.loc_id = unit_location_id
         self.pos = None
         self.loc = None
