@@ -289,32 +289,32 @@ class Planet(pygame.sprite.Sprite):
             self.collide_rect.center = self.pos
 '''
 class Stack():
-    def __init__(self, stack_id, stack_location_id, unitlist, unit_ids)
+    def __init__(self, stack_id, stack_location_id, unit_list, unit_ids)
         self.id = stack_id
         self.loc_id = stack_location_id
-        self.unitlist = unitlist
-        self.unitids = unit_ids
-        self.units = pygame.sprite.LayeredDirty(unitlist)
+        self.unit_list = unit_list
+        self.unit_ids = unit_ids
+        self.units = pygame.sprite.LayeredDirty(unit_list)
         self.units.empty()
-        self.setattributes()
+        self.set_attributes()
         self.pos = None
         self.loc = None
         self.rect = None
         
-    def setattributes(self):
-        self.ppos = self.pos
+    def set_attributes(self):
+        self.prev_pos = self.pos
         self.pos = units[0].pos
-        self.ploc = self.loc
+        self.prev_loc = self.loc
         self.loc = units[0].loc
-        self.prect = self.rect
+        self.prev_rect = self.rect
         self.rect = units[0].rect
     
-    def updateunits(self, unit_ids):
+    def update_units(self, unit_ids):
         for unit in self.units.sprites():
             if not unit_ids.contains(unit.id):
                 self.units.remove(unit)
         for id in unit_ids:
-            for unit in self.unitlist.sprites:
+            for unit in self.unit_list.sprites:
                 if unit.id == id:
                     if not self.units.has(unit)
                         self.units.add(unit)
