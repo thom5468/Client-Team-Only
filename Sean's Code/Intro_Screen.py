@@ -1,7 +1,7 @@
 import pygame, string
 import New_Dumb_GUI
 import rpyc
-import backend.service as service
+import fitg.backend.service as service
 #import Demo2
 
 pygame.init()
