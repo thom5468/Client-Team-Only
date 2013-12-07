@@ -310,7 +310,7 @@ class Stack():
         self.rect = units[0].rect
     
     def updateunits(self, unit_ids):
-        for unit in self.units:
+        for unit in self.units.sprites():
             if not unit_ids.contains(unit.id):
                 self.units.remove(unit)
         for id in unit_ids:
@@ -325,11 +325,11 @@ class Stack():
             self.rect = units[0].rect
         if self.ppos is not self.pos:
             self.ppos = self.pos
-            for unit in self.units
+            for unit in self.units.sprites():
                 unit.pos = self.pos
         if self.ploc is not self.loc:
             self.ploc = self.loc
-            for unit in self.units:
+            for unit in self.units.sprites():
                 unit.loc = self.loc
             
     def update(self, unit_ids = self.unitids):
