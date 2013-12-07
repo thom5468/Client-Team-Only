@@ -97,15 +97,15 @@ def left_mouse_unselect_check(mouse, selected_unit, star_system):
         for planet in star_system.planet_list:
             if planet.collide_rect.colliderect(selected_unit.rect):
                 #response = client.root.move(stack_id=selected_unit.id, game_name=gamename, location_id=(star_system.id * 10 + planet.id) * 10)
-                selected_unit.loc_id = (star_system.id * 10 + planet.id) * 10
+                selected_unit.loc_id = (star_system.id * 10 + planet.id) * 10 ##process response
                 return None
             for environ in planet.environment.environ_list:
                 for point in environ.collision_points:
                     if selected_unit.rect.colliderect(pygame.Rect((point), (10, 10))):
                         #response = client.root.move(stack_id=selected_unit.id, game_name=gamename, location_id=(star_system.id * 10 + planet.id) * 10 + environ.id)
-                        selected_unit.loc_id = (star_system.id * 10 + planet.id) * 10 + environ.id
+                        selected_unit.loc_id = (star_system.id * 10 + planet.id) * 10 + environ.id ##process response
                         return None
-        ##process response
+        
 
 
 class System():
@@ -126,9 +126,9 @@ class System():
         # Unit Population
         #=======================================================================
         cis = Unit("cis", 110, "rebel_cis.jpg")
-        megathron = Unit("megathron", 120, "rebel_megathron.jpg")
-        vagabond = Unit("vagabond", 122, "imperial_vagabond.jpg")
-        viper = Unit("viper", 130, "imperial_viper.jpg")
+        megathron = Unit("megathron", 120, 5467, "rebel_megathron.jpg")
+        vagabond = Unit("vagabond", 122, 5468, "imperial_vagabond.jpg")
+        viper = Unit("viper", 130, 5469, "imperial_viper.jpg")
         self.unit_list = pygame.sprite.LayeredDirty((cis, megathron, vagabond, viper))
 
     def update(self):
@@ -314,7 +314,7 @@ class Stack():
             if not unit_ids.contains(unit.id):
                 self.units.remove(unit)
         for id in unit_ids:
-            for unit in self.unitlist:
+            for unit in self.unitlist.sprites:
                 if unit.id == id:
                     if not self.units.has(unit)
                         self.units.add(unit)
@@ -342,9 +342,9 @@ class Stack():
     
 '''
 class Unit(pygame.sprite.DirtySprite):
-    def __init__(self, unit_name, unit_location_id, image):
+    def __init__(self, unit_name, unit_location_id, unit_id, image):
         self.name = unit_name
-        self.id = 1
+        self.id = unit_id
         self.loc_id = unit_location_id
         self.pos = None
         self.loc = None
