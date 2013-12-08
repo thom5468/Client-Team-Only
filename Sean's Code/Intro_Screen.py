@@ -136,7 +136,7 @@ if __name__ == '__main__':
                     #pygame.mixer.music.stop()
                     playerscenario = setscenario(scenario.is_alt)
                     playerside = setplayer( allegiance.is_alt)
-                    gamesetup = client.root.start_game(name=gametextbox.input, player=playertextbox.input, scenario=playerscenario, ai=single_player.is_alt)
+                    gamesetup = client.root.start_game(name=gametextbox.input, player=playertextbox.input,  ai=single_player.is_alt) #scenario=playerscenario
                     print gamesetup
                     New_Dumb_GUI.main(gamesetup)
                     #fire request to server

@@ -14,7 +14,7 @@ import buttons
 pygame.init()
 
 
-def main(setupinfo):
+def main(setupinfo=None):
     screensize = (1024, 720)
     screen = pygame.display.set_mode(screensize)
     clock = pygame.time.Clock()
@@ -125,17 +125,18 @@ class System():
         #=======================================================================
         # Unit Population
         #=======================================================================
-        cis = Unit("cis", 110, "rebel_cis.jpg")
-        megathron = Unit("megathron", 120, 5467, "rebel_megathron.jpg")
-        vagabond = Unit("vagabond", 122, 5468, "imperial_vagabond.jpg")
+        cis = Unit("cis", 110, 5466, "rebel_cis.jpg")
+        megathron = Unit("megathron", 123, 5467, "rebel_megathron.jpg")
+        vagabond = Unit("vagabond", 123, 5468, "imperial_vagabond.jpg")
         viper = Unit("viper", 130, 5469, "imperial_viper.jpg")
-        self.unit_list = pygame.sprite.LayeredDirty((cis, megathron, vagabond, viper))
-
+        self.unit_list = [cis, megathron, vagabond, viper]
+        self.stack_manager = StackManager(self, self.unit_list)
+        
     def update(self):
         for planet in self.planet_list:
             planet.update()
             planet.environment.update(self.unit_list)
-        self._update_unit_location()
+        self.stack_manager.update_unit_location()
         for unit in self.unit_list:
             unit.update()
 
@@ -145,7 +146,7 @@ class System():
             if planet.orient is "center":
                 planet.environment.draw(self.screen)
                 break
-        self.unit_list.draw(self.screen)
+        self.stack_manager.draw()
 
     def planets_move(self, planet):
         self.move_dir = None
@@ -221,11 +222,13 @@ class System():
                                 if unit.rect.colliderect(pygame.Rect((point), (2, 2))):
                                     unit.pos = point
                                     unit.loc = None
+                                    unit.update()
                                     break
                                 else:
                                     if len(self.unit_list.get_sprites_at(point)) == 0:
                                         unit.pos = point
                                         unit.loc = None
+                                        unit.update()
                                         break
                         else:
                             unit.visible = 0
@@ -303,13 +306,13 @@ class Stack():
         
     def set_attributes(self):
         self.prev_pos = self.pos
-        self.pos = units[0].pos
+        self.pos = units.sprites[0].pos
         self.prev_loc = self.loc
-        self.loc = units[0].loc
+        self.loc = units.sprites[0].loc
         self.prev_rect = self.rect
-        self.rect = units[0].rect
+        self.rect = units.sprites[0].rect
     
-    def update_units(self, unit_ids):
+    def update_units(self, unit_ids ):
         for unit in self.units.sprites():
             if not unit_ids.contains(unit.id):
                 self.units.remove(unit)
@@ -341,6 +344,61 @@ class Stack():
         self.units.draw()           
     
 '''
+class StackManager():
+    def __init__(self, parent, stack_list):
+        self.parent = parent
+        self.screen = self.parent.screen
+        self.stack_list =[]
+        self.loc = None
+        for stack_num, unit in enumerate(stack_list):
+            stack_num = pygame.sprite.LayeredDirty((unit))
+            self.stack_list.append(stack_num)
+
+    def update_unit_location(self):
+        for stack in self.stack_list:
+            for unit in stack:
+                loc_id = unit.loc_id
+                unit.visible = 1
+                while loc_id:
+                    digits = int(math.log10(loc_id)) + 1
+                    if digits >= 3:
+                        environ_id = loc_id % 10
+                    elif digits >= 2:
+                        planet_id = loc_id % 10
+                    elif digits >= 1:
+                        self.parent.system_id = loc_id % 10
+                    loc_id /= 10
+                for planet in self.parent.planet_list:
+                    if planet.id == planet_id:
+                        if environ_id == 0:
+                            unit.pos = None
+                            unit.loc = planet.collide_rect
+                        else:
+                            if planet.orient is "center":
+                                for point in planet.environment.environ_list[environ_id - 1].collision_points:
+                                    if unit.rect.colliderect(pygame.Rect((point), (2, 2))):
+                                        unit.pos = point
+                                        unit.loc = None
+                                        unit.update()
+                                        break
+                                    else:
+                                        if len(stack.get_sprites_at(point)) == 0:
+                                            unit.pos = point
+                                            unit.loc = None
+                                            unit.update()
+                                            break
+                            else:
+                                unit.visible = 0
+                                break
+                stack.draw(self.screen)
+                break
+
+    def draw(self):
+        for stack in self.stack_list:
+            stack.draw(self.screen)
+            
+
+
 class Unit(pygame.sprite.DirtySprite):
     def __init__(self, unit_name, unit_location_id, unit_id, image):
         self.name = unit_name
