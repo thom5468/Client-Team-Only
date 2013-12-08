@@ -81,7 +81,30 @@ class my_button:
             self.is_hover = True 
         else:
             self.is_hover = False
+    
+class gamelistingbox:
+    def __init__ (self):
+        self.obj = None
+        self.default_color = (100,100,100)
+        self.hover_color = (204,102, 0)
+        self.font_color = (220, 220, 20)
+        self.joinbutton = my_button("Join")
+        self.cancelbutton = my_button("Cancel")
+        self.visible = False
+        self.x = 30
+        self.y = 350
+        self.width = 300
+        self.height = 200
+        
+    def draw(self, screen):
+        if self.visible:
+            self.obj = pygame.draw.rect(screen, self.default_color, (self.x, self.y, self.width, self.height))
+            self.joinbutton.draw(screen, (50, 500, 200, 40))
+            self.cancelbutton(screen, (300, 500, 200, 40))
             
+        
+        
+        
 def setscenario(scenarioflag):
     if scenarioflag is False:
         return 'egrix'
