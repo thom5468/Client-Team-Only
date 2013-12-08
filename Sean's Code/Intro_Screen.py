@@ -14,6 +14,13 @@ class my_textbox:
         self.default_color = (100,100,100)
         self.font_color = (220, 220, 20)
         self.obj = None
+        self.nextchar = "_"
+    
+    def switchchar (self):
+        if self.nextchar == "_":
+            self.nextchar = chr(9)
+        else:
+            self.nextchar ="_"
         
     def label(self, text):
         font = pygame.font.Font(None, 20)
@@ -23,17 +30,19 @@ class my_textbox:
         if inkey == pygame.K_BACKSPACE:
             self.text = self.text[0:-1]
         elif inkey == pygame.K_MINUS:
-            self.text.append("_")
+            self.text.append("-")
         elif inkey <= 127:
-            self.text.append(chr(inkey))
+            print inkey
+            if len(self.text) < 30:
+                self.text.append(chr(inkey))
         self.input = string.join(self.text,"")
     
     def draw (self, screen, rect_coord):
         label_coord = (rect_coord[0]+4, rect_coord[1]+4)
         self.obj = pygame.draw.rect(screen, self.default_color, rect_coord)
         screen.blit(self.label(self.title), (label_coord[0], label_coord[1]))
-        screen.blit(self.label(self.input), (label_coord[0], label_coord[1]+20))
-        pygame.draw.line(screen, self.font_color, (label_coord[0], label_coord[1]+42),(label_coord[0]+242, label_coord[1]+42))
+        screen.blit(self.label(self.input+self.nextchar), (label_coord[0], label_coord[1]+20))
+        pygame.draw.line(screen, self.font_color, (label_coord[0], label_coord[1]+33),(label_coord[0]+242, label_coord[1]+33))
 
 class my_button:
     def __init__(self, text, alttext=''):
@@ -165,9 +174,15 @@ if __name__ == '__main__':
                     run = False
                     print('my button exit clicked')
                 elif gametextbox.obj.collidepoint(mouse):
+                    if selectedtextbox is not None:
+                        selectedtextbox.switchchar()
                     selectedtextbox = gametextbox
+                    selectedtextbox.switchchar()
                 elif playertextbox.obj.collidepoint(mouse):
+                    if selectedtextbox is not None:
+                        selectedtextbox.switchchar()
                     selectedtextbox = playertextbox
+                    selectedtextbox.switchchar()
                 #elif demo.obj.collidepoint(mouse):
                     #run = False
                     #Demo2.main()
@@ -184,8 +199,8 @@ if __name__ == '__main__':
         allegiance.draw(screen, mouse, (196,607,155,40), (201,611))
         scenario.draw(screen, mouse, (364,607,155,40), (369,611))
         
-        gametextbox.draw(screen, (13,550,250,50))
-        playertextbox.draw(screen, (270,550,250,50))
+        gametextbox.draw(screen, (13,560,250,42))
+        playertextbox.draw(screen, (270,560,250,42))
         
         #demo.draw(screen, mouse, (162,651,215,40), (188,654))
 
