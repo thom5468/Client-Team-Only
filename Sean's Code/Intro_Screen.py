@@ -2,6 +2,7 @@ import pygame, string
 import New_Dumb_GUI
 import rpyc
 import fitg.backend.service as service
+from pprint import pprint
 #import Demo2
 
 pygame.init()
@@ -45,11 +46,12 @@ class my_textbox:
         pygame.draw.line(screen, self.font_color, (label_coord[0], label_coord[1]+33),(label_coord[0]+242, label_coord[1]+33))
 
 class my_button:
-    def __init__(self, text, alttext=''):
+    def __init__(self, text, alttext='', fontsize = 40):
         self.text = text
         self.alttext = alttext
         self.is_alt = False
         self.is_hover = False
+        self.fontsize = fontsize
         self.default_color = (100,100,100)
         self.hover_color = (204,102, 0)
         self.font_color = (220, 220, 20)
@@ -59,7 +61,7 @@ class my_button:
         self.is_alt = not self.is_alt
         
     def label(self):
-        font = pygame.font.Font(None, 40)
+        font = pygame.font.Font(None, self.fontsize)
         if self.is_alt:
             return font.render(self.alttext, 1, self.font_color)
         else:
@@ -85,22 +87,37 @@ class my_button:
 class gamelistingbox:
     def __init__ (self):
         self.obj = None
-        self.default_color = (100,100,100)
+        self.default_color = (50,50,50)
         self.hover_color = (204,102, 0)
         self.font_color = (220, 220, 20)
-        self.joinbutton = my_button("Join")
-        self.cancelbutton = my_button("Cancel")
+        self.joinbutton = my_button("Join", fontsize = 20)
+        self.cancelbutton = my_button("Cancel", fontsize = 20)
         self.visible = False
+        self.gamelist = None
         self.x = 30
         self.y = 350
         self.width = 300
         self.height = 200
         
-    def draw(self, screen):
+    def draw(self, screen, mouse):
         if self.visible:
             self.obj = pygame.draw.rect(screen, self.default_color, (self.x, self.y, self.width, self.height))
-            self.joinbutton.draw(screen, (50, 500, 200, 40))
-            self.cancelbutton(screen, (300, 500, 200, 40))
+            self.joinbutton.draw(screen, mouse, (60, 520, 100, 20), (95, 524))
+            self.cancelbutton.draw(screen, mouse, (200, 520, 100, 20), (225, 524))
+            
+    def checkclick(self, mouse, redraw):
+        if self.cancelbutton.obj.collidepoint(mouse):
+            self.visible = False
+            return True
+        else:
+            return redraw
+        #elif self.joinbutton.obj.collidepoint(mouse):
+        
+    def setgamelist(self, newgamelist):
+        self.gamelist = newgamelist
+        for game in self.gamelist['response']['games']:
+            print game
+            
             
         
         
@@ -139,6 +156,7 @@ if __name__ == '__main__':
     #demo = my_button('PROTOTYPE')
     #screen = pygame.display.set_mode((298,389))
     screen = pygame.display.set_mode((536,720))
+    listingbox = gamelistingbox()
     
     playerside = ''
     playerscenario = ''
@@ -148,6 +166,7 @@ if __name__ == '__main__':
 
     clock = pygame.time.Clock()
 
+    redrawscreen = False
     screen.blit(background, background.get_rect())
     pygame.display.flip()
     
@@ -174,6 +193,8 @@ if __name__ == '__main__':
                     #fire request to server
                     print('my_button start game clicked')
                 elif join.obj.collidepoint(mouse):
+                    listingbox.visible = True
+                    listingbox.setgamelist(client.root.list_games())
                     #client.root.list_games()
                     print('my_button join game clicked')
                 elif allegiance.obj.collidepoint(mouse):
@@ -206,6 +227,9 @@ if __name__ == '__main__':
                         selectedtextbox.switchchar()
                     selectedtextbox = playertextbox
                     selectedtextbox.switchchar()
+                elif listingbox.visible is True:
+                    if listingbox.obj.collidepoint(mouse):
+                        redrawscreen = listingbox.checkclick(mouse, redrawscreen)
                 #elif demo.obj.collidepoint(mouse):
                     #run = False
                     #Demo2.main()
@@ -213,7 +237,11 @@ if __name__ == '__main__':
         #start.draw(screen, mouse, (90,300,120,22), (115,303))
         #option.draw(screen, mouse, (90,330,120,22), (125,333))
         #exit.draw(screen, mouse, (90,360,120,22), (115,363))
-
+        if redrawscreen is True:
+            screen.blit(background, background.get_rect())
+            pygame.display.flip()
+            redrawscreen = False
+        
         start.draw(screen, mouse, (13,650,170,40), (18,658))
         join.draw(screen, mouse, (196,650,155,40), (201,658))
         exit.draw(screen, mouse, (364,650,155,40), (369,658))
@@ -224,6 +252,9 @@ if __name__ == '__main__':
         
         gametextbox.draw(screen, (13,560,250,42))
         playertextbox.draw(screen, (270,560,250,42))
+        
+        if listingbox.visible is True:
+            listingbox.draw(screen, mouse)
         
         #demo.draw(screen, mouse, (162,651,215,40), (188,654))
 
