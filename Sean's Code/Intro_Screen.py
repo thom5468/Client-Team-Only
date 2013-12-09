@@ -120,7 +120,7 @@ def setplayer( sideflag):
             
 if __name__ == '__main__':
 
-    client = None #rpyc.connect("elegantgazelle.com", 55889, service.ClientService)
+    client = rpyc.connect("elegantgazelle.com", 55889, service.ClientService)
 
     background = pygame.image.load("freedom_galaxy.jpg")
     #background = pygame.transform.scale(background, (389, 489))
