@@ -46,7 +46,11 @@ def main(setupinfo=None):
                 sys.exit()
             if not mouse_ptr.down:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-
+                    if selected_unit:
+                        hover_unit = left_mouse_select_check(mouse_sel, star_system)
+                        if hover_unit != selected_unit:
+                            selected_unit.add_unit(hover_unit)
+                            star_system.unit_list.remove(hover_unit)
                     print "SPACE BAR"
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
@@ -59,10 +63,17 @@ def main(setupinfo=None):
                     elif event.button == 3:
                         key_mod = pygame.key.get_mods()
                         if key_mod == 4097 or key_mod == 1:
-
+                            hover_unit = star_system.unit_list.get_sprites_at(mouse_ptr.pos)
+                            print "STACK REMOVING FROM", hover_unit
+                            if hover_unit:
+                                sprite = hover_unit[0].remove_unit()
+                                if sprite:
+                                    star_system.unit_list.add(sprite)
                             print "SHIFT RIGHT CLICK"
                         else:
-
+                            hover_unit = star_system.unit_list.get_sprites_at(mouse_ptr.pos)
+                            if hover_unit:
+                                hover_unit[0].cycle_unit()
                             print "RIGHT CLICK"
 
             if event.type == pygame.MOUSEBUTTONUP:
@@ -85,6 +96,7 @@ def main(setupinfo=None):
 def left_mouse_select_check(mouse, star_system):
     for unit in star_system.unit_list:
         if unit.rect.collidepoint(mouse.pos) and unit.visible == 1:
+            star_system.unit_list.move_to_front(unit)
             return unit
     for planet in star_system.planet_list:
         if planet.rect.collidepoint(mouse.pos):
@@ -105,7 +117,6 @@ def left_mouse_unselect_check(mouse, selected_unit, star_system):
                         #response = client.root.move(stack_id=selected_unit.id, game_name=gamename, location_id=(star_system.id * 10 + planet.id) * 10 + environ.id)
                         selected_unit.loc_id = (star_system.id * 10 + planet.id) * 10 + environ.id ##process response
                         return None
-        
 
 
 class System():
@@ -129,14 +140,13 @@ class System():
         megathron = Unit("megathron", 123, 5467, "rebel_megathron.jpg")
         vagabond = Unit("vagabond", 123, 5468, "imperial_vagabond.jpg")
         viper = Unit("viper", 130, 5469, "imperial_viper.jpg")
-        self.unit_list = [cis, megathron, vagabond, viper]
-        self.stack_manager = StackManager(self, self.unit_list)
-        
+        self.unit_list = pygame.sprite.LayeredDirty((cis, megathron, vagabond, viper))
+
     def update(self):
         for planet in self.planet_list:
             planet.update()
-            planet.environment.update(self.unit_list)
-        self.stack_manager.update_unit_location()
+            planet.environment.update()
+        self._update_unit_location()
         for unit in self.unit_list:
             unit.update()
 
@@ -146,7 +156,7 @@ class System():
             if planet.orient is "center":
                 planet.environment.draw(self.screen)
                 break
-        self.stack_manager.draw()
+        self.unit_list.draw(self.screen)
 
     def planets_move(self, planet):
         self.move_dir = None
@@ -344,59 +354,6 @@ class Stack():
         self.units.draw()           
     
 '''
-class StackManager():
-    def __init__(self, parent, stack_list):
-        self.parent = parent
-        self.screen = self.parent.screen
-        self.stack_list =[]
-        self.loc = None
-        for stack_num, unit in enumerate(stack_list):
-            stack_num = pygame.sprite.LayeredDirty((unit))
-            self.stack_list.append(stack_num)
-
-    def update_unit_location(self):
-        for stack in self.stack_list:
-            for unit in stack:
-                loc_id = unit.loc_id
-                unit.visible = 1
-                while loc_id:
-                    digits = int(math.log10(loc_id)) + 1
-                    if digits >= 3:
-                        environ_id = loc_id % 10
-                    elif digits >= 2:
-                        planet_id = loc_id % 10
-                    elif digits >= 1:
-                        self.parent.system_id = loc_id % 10
-                    loc_id /= 10
-                for planet in self.parent.planet_list:
-                    if planet.id == planet_id:
-                        if environ_id == 0:
-                            unit.pos = None
-                            unit.loc = planet.collide_rect
-                        else:
-                            if planet.orient is "center":
-                                for point in planet.environment.environ_list[environ_id - 1].collision_points:
-                                    if unit.rect.colliderect(pygame.Rect((point), (2, 2))):
-                                        unit.pos = point
-                                        unit.loc = None
-                                        unit.update()
-                                        break
-                                    else:
-                                        if len(stack.get_sprites_at(point)) == 0:
-                                            unit.pos = point
-                                            unit.loc = None
-                                            unit.update()
-                                            break
-                            else:
-                                unit.visible = 0
-                                break
-                stack.draw(self.screen)
-                break
-
-    def draw(self):
-        for stack in self.stack_list:
-            stack.draw(self.screen)
-            
 
 
 class Unit(pygame.sprite.DirtySprite):
@@ -408,7 +365,46 @@ class Unit(pygame.sprite.DirtySprite):
         self.loc = None
         pygame.sprite.DirtySprite.__init__(self)
         self.image, self.rect = load_image(image, -1)
+        self.prev_image = self.image
         self.dirty = 2
+        self.stack_list = list()
+        self.stack_list.append(self)
+
+    def cycle_unit(self):
+        if len(self.stack_list) > 1:
+            sprite = self.stack_list.pop()
+            self.stack_list.insert(0, sprite)
+            if sprite == self:
+                self.image = self.prev_image
+            else:
+                self.image = sprite.image
+
+    def add_unit(self, sprite):
+        #sprite.visible = 0
+        #sprite.loc_id = self.loc_id
+        #sprite.pos = self.pos
+        #sprite.loc = self.loc
+        self.stack_list.extend(sprite.stack_list)
+        sprite.stack_list = list()
+        for sprite in self.stack_list:
+            sprite.image = sprite.prev_image
+
+    def remove_unit(self):
+        if len(self.stack_list) > 1:
+            sprite = self.stack_list.pop()
+            if sprite == self:
+                self.stack_list.insert(0, self)
+                sprite = self.stack_list.pop()
+            if len(self.stack_list) == 1:
+                self.image = self.prev_image
+            sprite.visible = 1
+            sprite.loc_id = self.loc_id
+            sprite.pos = self.pos
+            sprite.loc = self.loc
+            sprite.stack_list.append(sprite)
+            return sprite
+        else:
+            return None
 
     def update(self, selected=None, animate=None):
         if selected:
@@ -460,6 +456,8 @@ def load_image(image, colorkey=None):
         if colorkey is -1:
             colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey)  # pygame.RLEACCEL can improve performance
+    else:
+        image = image.convert_alpha()
     return image, image.get_rect()
 
 if __name__ == '__main__':
