@@ -232,7 +232,17 @@ if __name__ == '__main__':
                 run = False
             elif event.type == pygame.KEYDOWN:
                 if selectedtextbox is not None:
-                    selectedtextbox.addkey(event.key)
+                    if event.key == 9:
+                        if selectedtextbox == gametextbox:
+                            selectedtextbox.switchchar()
+                            selectedtextbox = playertextbox
+                            selectedtextbox.switchchar()
+                        elif selectedtextbox == playertextbox:
+                            selectedtextbox.switchchar()
+                            selectedtextbox = gametextbox
+                            selectedtextbox.switchchar()
+                    else:
+                        selectedtextbox.addkey(event.key)
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if start.obj.collidepoint(mouse):
                     run = False
@@ -240,6 +250,9 @@ if __name__ == '__main__':
                     playerscenario = setscenario(scenario.is_alt)
                     playerside = setplayer( allegiance.is_alt)
                     gamesetup = client.root.start_game(name=gametextbox.input, player=playertextbox.input) #, scenario=playerscenario, ai=single_player.is_alt)
+                    print("Getting state of planets")
+                    planet = client.root.get_state(object_id=1, object_type="Planet")
+                    print planet
                     print gamesetup
                     New_Dumb_GUI.main(gamesetup)
                     #fire request to server
@@ -299,13 +312,13 @@ if __name__ == '__main__':
             redrawscreen = False
         
         if listingbox.visible is True:
+            listingbox.draw(screen, mouse)
             if gamelisting is not None:
                 if gamelisting.ready:
                     listingbox.setgamelist(gamelisting.value)
                     gamelisting = None
                 else:
                     listingbox.drawloading(screen)
-            listingbox.draw(screen, mouse)
             single_player.is_alt = True
             if listingbox.selectedgame is not None:
                 gametextbox.input = listingbox.selectedgame["name"]
