@@ -1,7 +1,7 @@
 import pygame, string
 import New_Dumb_GUI
 import rpyc
-from fitg.backend.service import ClientService
+import service
 
 pygame.init()
 
@@ -192,7 +192,7 @@ def setplayer( sideflag):
             
 if __name__ == '__main__':
 
-    client = rpyc.connect("elegantgazelle.com", 55889, ClientService)
+    client = rpyc.connect("elegantgazelle.com", 55889, service.ClientService)
 
     background = pygame.image.load("freedom_galaxy.jpg")
     #background = pygame.transform.scale(background, (389, 489))
