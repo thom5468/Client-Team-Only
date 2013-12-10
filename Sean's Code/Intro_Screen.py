@@ -2,8 +2,6 @@ import pygame, string
 import New_Dumb_GUI
 import rpyc
 import fitg.backend.service as service
-from pprint import pprint
-#import Demo2
 
 pygame.init()
 
@@ -33,7 +31,6 @@ class my_textbox:
         elif inkey == pygame.K_MINUS:
             self.text.append("-")
         elif inkey <= 127:
-            print inkey
             if len(self.text) < 30:
                 self.text.append(chr(inkey))
         self.input = string.join(self.text,"")
@@ -90,37 +87,95 @@ class gamelistingbox:
         self.default_color = (50,50,50)
         self.hover_color = (204,102, 0)
         self.font_color = (220, 220, 20)
-        self.joinbutton = my_button("Join", fontsize = 20)
-        self.cancelbutton = my_button("Cancel", fontsize = 20)
+        self.fontsize = 20
+        self.joinbutton = my_button("Join", fontsize = self.fontsize)
+        self.cancelbutton = my_button("Cancel", fontsize = self.fontsize)
+        self.refreshbutton = my_button("Refresh", fontsize = self.fontsize)
         self.visible = False
-        self.gamelist = None
+        self.scenarioflag = False
         self.x = 30
-        self.y = 350
-        self.width = 300
-        self.height = 200
+        self.y = 275
+        self.width = 475
+        self.height = 250
+        self.selectedgame = None
+        self.selectedindex = None
+        self.gamelist = []
+        self.namelist = []
+        self.playerlist = []
+        self.scenariolist = []
+        self.sidelist = []
+        self.gamebox = pygame.Rect(self.x, self.y+self.fontsize, self.width, self.fontsize*len(self.namelist))
+        self.loadingtext = self.label("Loading", 60)
         
+    def label(self, text, font_size):
+        font = pygame.font.Font(None, font_size)
+        return font.render(text, 1, self.font_color)
+            
     def draw(self, screen, mouse):
         if self.visible:
+            #if self.response is not None:
+            #    if self.response.ready:
+            #        self.processresponse()
+            #        self.response = None
             self.obj = pygame.draw.rect(screen, self.default_color, (self.x, self.y, self.width, self.height))
-            self.joinbutton.draw(screen, mouse, (60, 520, 100, 20), (95, 524))
-            self.cancelbutton.draw(screen, mouse, (200, 520, 100, 20), (225, 524))
+            self.joinbutton.draw(screen, mouse, (self.x+30, self.y+225, 100, self.fontsize), (self.x+65, self.y+225+4))
+            self.cancelbutton.draw(screen, mouse, (self.x+self.width-130, self.y+225, 100, self.fontsize), (self.x+self.width-130+25, self.y+225+4))
+            self.refreshbutton.draw(screen, mouse, ((self.x+(self.width-100)/2), self.y+225, 100, self.fontsize), ((self.x+(self.width-100)/2)+25, self.y+225+4))
             
-    def checkclick(self, mouse, redraw):
-        if self.cancelbutton.obj.collidepoint(mouse):
-            self.visible = False
-            return True
-        else:
-            return redraw
-        #elif self.joinbutton.obj.collidepoint(mouse):
-        
-    def setgamelist(self, newgamelist):
-        self.gamelist = newgamelist
-        for game in self.gamelist['response']['games']:
-            print game
+            screen.blit(self.label("Game Name", self.fontsize), (self.x+34, self.y+4))
+            screen.blit(self.label("Player Name", self.fontsize), (self.x+184, self.y+4))
+            screen.blit(self.label("Player Side", self.fontsize), (self.x+313, self.y+4))
+            screen.blit(self.label("Scenario", self.fontsize), (self.x+408, self.y+4))
             
+            pygame.draw.line(screen, self.font_color, (self.x+150, self.y+4), (self.x+150, self.y+220))
+            pygame.draw.line(screen, self.font_color, (self.x+300, self.y+4), (self.x+300, self.y+220))
+            pygame.draw.line(screen, self.font_color, (self.x+400, self.y+4), (self.x+400, self.y+220))
+            pygame.draw.line(screen, self.font_color, (self.x+4, self.y+self.fontsize), (self.x+467, self.y+self.fontsize))
+            pygame.draw.line(screen, self.font_color, (self.x+4, self.y+220), (self.x+467, self.y+220))
             
+            if self.selectedindex is not None:
+                pygame.draw.rect(screen, self.hover_color, (self.x+4, self.y+(self.fontsize*(self.selectedindex+1)), 467, self.fontsize))
+            
+            for name in self.namelist:
+                screen.blit(name[0], name[1])
+            for player in self.playerlist:
+                screen.blit(player[0], player[1])
+            for scenario in self.scenariolist:    
+                screen.blit(scenario[0], scenario[1])
+            for side in self.sidelist:    
+                screen.blit(side[0], side[1])
+            
+    def drawloading(self, screen):
+        screen.blit(self.loadingtext, (self.x+100, self.y+100))
+    
+    def checkclick(self, mouse):
+        if mouse[0] > self.x and mouse[0] < self.x+self.width:
+            self.selectedindex = int((mouse[1]-self.y-self.fontsize)/self.fontsize)
+            self.selectedgame = self.gamelist[self.selectedindex]
+            if self.selectedgame["scenario"] == "egrix":
+                self.scenarioflag = False
+            else:
+                self.scenarioflag = True
+            #if self.selectedgame["allegiance"] == "rebel":
+            #    self.sideflag = True
+    
+    def setgamelist(self, gamedict):
+        print "Stuff"
+        self.gamelist = []
+        self.namelist = []
+        self.playerlist = []
+        self.scenariolist = []
+        self.sidelist = []
+        for index, game in enumerate(gamedict['response']['games']):
+            if index < 10:
+                self.gamelist.append(game)
+                self.namelist.append((self.label(game["name"], self.fontsize), (self.x+4, self.y+4+((index+1)*self.fontsize))))
+                self.playerlist.append((self.label(game["player1"], self.fontsize), (self.x+154, self.y+4+((index+1)*self.fontsize))))
+                self.scenariolist.append((self.label(game["scenario"], self.fontsize), (self.x+404, self.y+4+((index+1)*self.fontsize))))
+                #self.sidelist.append((self.label(game["allegiance"], self.fontsize), (self.x+304, self.y+4+((index+1)*self.fontsize)))
+        self.gamebox = pygame.Rect(self.x, self.y+self.fontsize, self.width, self.fontsize*len(self.namelist))
         
-        
+            
         
 def setscenario(scenarioflag):
     if scenarioflag is False:
@@ -144,17 +199,12 @@ if __name__ == '__main__':
 
     start = my_button('Start Game')
     join = my_button('Join Game')
-    #option = my_button('Option')
     allegiance = my_button('Rebel', 'Empire')
-    #imperial = my_button('Imperials')
     single_player = my_button('Play AI', '2 Player')
-    #two_player = my_button('Player vs Player')
     scenario = my_button('Flight', 'Powder')
     exit = my_button('Exit Game')
     gametextbox = my_textbox('Game Name')
     playertextbox = my_textbox('Your Name')
-    #demo = my_button('PROTOTYPE')
-    #screen = pygame.display.set_mode((298,389))
     screen = pygame.display.set_mode((536,720))
     listingbox = gamelistingbox()
     
@@ -169,6 +219,8 @@ if __name__ == '__main__':
     redrawscreen = False
     screen.blit(background, background.get_rect())
     pygame.display.flip()
+    
+    gamelistasync = rpyc.async(client.root.list_games)
     
     selectedtextbox = None
     
@@ -187,30 +239,25 @@ if __name__ == '__main__':
                     #pygame.mixer.music.stop()
                     playerscenario = setscenario(scenario.is_alt)
                     playerside = setplayer( allegiance.is_alt)
-                    gamesetup = client.root.start_game(name=gametextbox.input, player=playertextbox.input,  ai=single_player.is_alt) #scenario=playerscenario
+                    gamesetup = client.root.start_game(name=gametextbox.input, player=playertextbox.input, scenario=playerscenario, ai=single_player.is_alt)
                     print gamesetup
                     New_Dumb_GUI.main(gamesetup)
                     #fire request to server
                     print('my_button start game clicked')
                 elif join.obj.collidepoint(mouse):
                     listingbox.visible = True
-                    listingbox.setgamelist(client.root.list_games())
-                    #client.root.list_games()
+                    gamelisting = gamelistasync()
                     print('my_button join game clicked')
                 elif allegiance.obj.collidepoint(mouse):
                     allegiance.switch_text()
                     if single_player.is_alt is False:
                         allegiance.is_alt = False
                     print('my_button rebel clicked')
-#               elif imperial.obj.collidepoint(mouse):
-#                   print('my_button imperials clicked')
                 elif single_player.obj.collidepoint(mouse):
                     single_player.switch_text()
                     if single_player.is_alt is False:
                         allegiance.is_alt = False
                     print('my button player vs AI clicked')
-#               elif two_player.obj.collidepoint(mouse):
-#                   print('my button player vs player clicked')
                 elif scenario.obj.collidepoint(mouse):
                     scenario.switch_text()
                     print('my button scenario clicked')
@@ -229,18 +276,42 @@ if __name__ == '__main__':
                     selectedtextbox.switchchar()
                 elif listingbox.visible is True:
                     if listingbox.obj.collidepoint(mouse):
-                        redrawscreen = listingbox.checkclick(mouse, redrawscreen)
-                #elif demo.obj.collidepoint(mouse):
-                    #run = False
-                    #Demo2.main()
-
-        #start.draw(screen, mouse, (90,300,120,22), (115,303))
-        #option.draw(screen, mouse, (90,330,120,22), (125,333))
-        #exit.draw(screen, mouse, (90,360,120,22), (115,363))
+                        if listingbox.cancelbutton.obj.collidepoint(mouse):
+                            redrawscreen = True
+                            listingbox.visible = False
+                        elif listingbox.joinbutton.obj.collidepoint(mouse):
+                            run = False
+                            #pygame.mixer.music.stop()
+                            playerscenario = setscenario(scenario.is_alt)
+                            playerside = setplayer( allegiance.is_alt)
+                            gamesetup = client.root.join_game(name=gametextbox.input, player=playertextbox.input) #scenario=playerscenario
+                            print gamesetup
+                            New_Dumb_GUI.main(gamesetup)
+                        elif listingbox.refreshbutton.obj.collidepoint(mouse):
+                            gamelisting = gamelistasync()
+                        elif listingbox.gamebox.collidepoint(mouse):
+                            listingbox.checkclick(mouse)
+                            
+                        
         if redrawscreen is True:
             screen.blit(background, background.get_rect())
             pygame.display.flip()
             redrawscreen = False
+        
+        if listingbox.visible is True:
+            if gamelisting is not None:
+                if gamelisting.ready:
+                    listingbox.setgamelist(gamelisting.value)
+                    gamelisting = None
+                else:
+                    listingbox.drawloading(screen)
+            listingbox.draw(screen, mouse)
+            single_player.is_alt = True
+            if listingbox.selectedgame is not None:
+                gametextbox.input = listingbox.selectedgame["name"]
+                gametextbox.text = list(gametextbox.input)
+                scenario.is_alt = listingbox.scenarioflag
+                
         
         start.draw(screen, mouse, (13,650,170,40), (18,658))
         join.draw(screen, mouse, (196,650,155,40), (201,658))
@@ -253,10 +324,7 @@ if __name__ == '__main__':
         gametextbox.draw(screen, (13,560,250,42))
         playertextbox.draw(screen, (270,560,250,42))
         
-        if listingbox.visible is True:
-            listingbox.draw(screen, mouse)
         
-        #demo.draw(screen, mouse, (162,651,215,40), (188,654))
 
         pygame.display.update()
         clock.tick(60)
