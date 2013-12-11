@@ -97,7 +97,7 @@ class EnvironBox():
         self.environ_list.append(Environ(self.parent, self.planet.center, self.planet.width / 2 + 50, self.planet.width / 2 + 150,
                                          idnumber, type, size, race, creature, politics))
 
-    def update(self, unitlist):
+    def update(self):#unitlist
         for environ in self.environ_list:
             environ.center = self.planet.center
             environ.rect.center = environ.center
