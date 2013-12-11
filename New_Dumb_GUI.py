@@ -5,14 +5,14 @@ Created on Nov 28, 2013
 '''
 
 import pygame
-import buttons
+#import buttons
 import rpyc
-from system import System
-from custommouse import MouseCursor
-from loadimage import load_image
+from sys import exit as sysexit
+from entities.system import System
+from support.custommouse import MouseCursor
+from support.loadimage import load_image
 
 pygame.init()
-
 
 def main(client, setupinfo=None):
     screensize = (1024, 720)
@@ -45,10 +45,10 @@ def main(client, setupinfo=None):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                sys.exit()
+                sysexit()
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 pygame.quit()
-                sys.exit()
+                sysexit()
             if not mouse_ptr.down:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     if selected_unit:

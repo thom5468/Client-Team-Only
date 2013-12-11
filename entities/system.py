@@ -1,6 +1,6 @@
 import pygame
 from math import log10
-from units import Unit
+from unit import Unit
 from planet import Planet
 
 class System():

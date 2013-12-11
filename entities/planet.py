@@ -1,6 +1,6 @@
 import pygame
 import environments
-from loadimage import load_image
+from support.loadimage import load_image
 
 
 class Planet(pygame.sprite.Sprite):

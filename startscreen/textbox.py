@@ -28,7 +28,8 @@ class my_textbox:
         elif inkey <= 127:
             if len(self.text) < 30:
                 self.text.append(chr(inkey))
-        self.input = string.join(self.text,"")
+        self.input = ''
+        self.input = self.input.join(self.text)
     
     def draw (self, screen, rect_coord):
         label_coord = (rect_coord[0]+4, rect_coord[1]+4)

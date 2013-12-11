@@ -1,5 +1,5 @@
 import pygame
-from loadimage import load_image
+from support.loadimage import load_image
 
 
 class Unit(pygame.sprite.DirtySprite):

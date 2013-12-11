@@ -1,13 +1,12 @@
 import pygame, string
 import New_Dumb_GUI
 import rpyc
-import service
-from textbox import my_textbox
-from menubutton import my_button
-from listingbox import gamelistingbox
+import support.service as service
+from startscreen.textbox import my_textbox
+from startscreen.menubutton import my_button
+from startscreen.listingbox import gamelistingbox
 
 pygame.init()
-    
         
 def setscenario(scenarioflag):
     if scenarioflag is False:
