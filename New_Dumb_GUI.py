@@ -137,10 +137,5 @@ def left_mouse_unselect_check(mouse, selected_unit, star_system):
     '''
 
 
-
-
-
-
-
 if __name__ == '__main__':
     main()

@@ -20,14 +20,14 @@ class System():
         #=======================================================================
         # Unit Population
         #=======================================================================
-        cis = Unit("cis", 110, 5466, 9, "rebel_cis.jpg")
-        megathron = Unit("megathron", 123, 5467, 9, "rebel_megathron.jpg")
-        vagabond = Unit("vagabond", 123, 5468, 9, "imperial_vagabond.jpg")
-        viper = Unit("viper", 130, 5469, 9, "imperial_viper.jpg")
-        self.unit_list = pygame.sprite.LayeredDirty((cis, megathron, vagabond, viper))
+        #cis = Unit("cis", 110, 5466, 9, "rebel_cis.jpg")
+        #megathron = Unit("megathron", 123, 5467, 9, "rebel_megathron.jpg")
+        #agabond = Unit("vagabond", 123, 5468, 9, "imperial_vagabond.jpg")
+        #iper = Unit("viper", 130, 5469, 9, "imperial_viper.jpg")
+        self.unit_list = pygame.sprite.LayeredDirty()
 
     def addunit (self, unitdict):
-        newunit = Unit(unitdict["name"], 110, unitdict["id"], unitdict["stack_id"], unitdict["img"])
+        newunit = Unit(unitdict)
         for unit in self.unit_list:
             if newunit.stack_id == unit.stack_id:
                 unit.add_unit(newunit)

@@ -3,15 +3,15 @@ from loadimage import load_image
 
 
 class Unit(pygame.sprite.DirtySprite):
-    def __init__(self, unit_name, unit_location_id, unit_id, stack_id, image):
-        self.name = unit_name
-        self.id = unit_id
-        self.stack_id = stack_id
-        self.loc_id = unit_location_id
+    def __init__(self, unitdict):
+        self.name = unitdict["name"]
+        self.id = unitdict["id"]
+        self.stack_id = unitdict["stack_id"]
+        self.loc_id = 110
         self.pos = None
         self.loc = None
         pygame.sprite.DirtySprite.__init__(self)
-        self.image, self.rect = load_image(image)
+        self.image, self.rect = load_image(unitdict["img"])
         self.prev_image = self.image
         self.dirty = 2
         self.stack_list = list()
