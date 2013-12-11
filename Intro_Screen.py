@@ -21,7 +21,7 @@ def setplayer( sideflag):
         return 'imperial'
    
 def main ():
-    client = rpyc.connect("elegantgazelle.com", 55889, service.ClientService)
+    client = rpyc.connect("elegantgazelle.com", 55889, service.ClientService, config = {"allow_public_attrs" : True})
 
     background = pygame.image.load("data/freedom_galaxy.jpg")
     #background = pygame.transform.scale(background, (389, 489))

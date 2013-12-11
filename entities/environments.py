@@ -20,7 +20,9 @@ class Environ():
         self.id = idnumber
         self.type = type
         self.size = size
+        self.star_faring = star_faring
         self.race = race
+        
         self.creature = creature
         self.politics = politics
         self.startangle = STARTANGLE + (self.id * UNITANGLE)
