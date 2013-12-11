@@ -35,8 +35,9 @@ def main(client, setupinfo=None):
     #===========================================================================
     star_system = System(screen, background, animate)
     characterresponse = client.root.get_state(object_id=0, object_type="Character")
-    #for character in characterresponse["response"]["Character"]:
-    #    star_system.addunit(character)
+    print characterresponse
+    for character in characterresponse["response"]["Character"]:
+        star_system.addunit(character)
     
     selected_unit = None
 
@@ -153,19 +154,20 @@ class System():
         #=======================================================================
         # Unit Population
         #=======================================================================
-        cis = Unit("cis", 110, 5466, 1, "rebel_cis.jpg")
-        megathron = Unit("megathron", 123, 5467, 2, "rebel_megathron.jpg")
-        vagabond = Unit("vagabond", 123, 5468, 3, "imperial_vagabond.jpg")
-        viper = Unit("viper", 130, 5469, 4, "imperial_viper.jpg")
+        cis = Unit("cis", 110, 5466, 9, "rebel_cis.jpg")
+        megathron = Unit("megathron", 123, 5467, 9, "rebel_megathron.jpg")
+        vagabond = Unit("vagabond", 123, 5468, 9, "imperial_vagabond.jpg")
+        viper = Unit("viper", 130, 5469, 9, "imperial_viper.jpg")
         self.unit_list = pygame.sprite.LayeredDirty((cis, megathron, vagabond, viper))
 
     def addunit (self, unitdict):
-        newunit = Unit(unitdict["name"], 111, unitdict["id"], unitdict["stack_id"], unitdict["img"])
+        newunit = Unit(unitdict["name"], 110, unitdict["id"], unitdict["stack_id"], unitdict["img"])
         for unit in self.unit_list:
             if newunit.stack_id == unit.stack_id:
-                unit.addunit(newunit)
+                unit.add_unit(newunit)
                 break
-        self.unit_list.add(newunit)
+            else:
+                self.unit_list.add(newunit)
         
     def update(self):
         for planet in self.planet_list:
@@ -335,7 +337,7 @@ class Unit(pygame.sprite.DirtySprite):
         self.pos = None
         self.loc = None
         pygame.sprite.DirtySprite.__init__(self)
-        self.image, self.rect = load_image(image, -1)
+        self.image, self.rect = load_image(image)
         self.prev_image = self.image
         self.dirty = 2
         self.stack_list = list()
