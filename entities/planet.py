@@ -4,10 +4,14 @@ from support.loadimage import load_image
 
 
 class Planet(pygame.sprite.Sprite):
-    def __init__(self, parent_system, planet_id, planet_name, planet_orientation, image):
+    def __init__(self, parent_system, planetdict, environlist, planet_orientation, image):
         self.parent = parent_system
-        self.id = planet_id
-        self.name = planet_name
+        self.id = planetdict["location"]
+        self.name = planetdict["name"]
+        self.pdb_state = planetdict["pdb_state"]
+        self.loyalty = planetdict["loyalty"]
+        self.pdb_level = planetdict["pdb_level"]
+        self.environ_count = planetdict["environ_count"]
         self.orient = planet_orientation
         self.prev_orient = None
         if self.orient is "left":
@@ -23,9 +27,12 @@ class Planet(pygame.sprite.Sprite):
         # Environment Population
         #=======================================================================
         self.environment = environments.EnvironBox(self, self.rect)
-        self.environment.addEnviron(1, 'W', 2, "Humans", "Animals", 'C')
-        self.environment.addEnviron(2, 'U', 1, "Bricktons", "Animals", 'C')
-        self.environment.addEnviron(3, 'F', 3, "Corruptons", "Animals", 'A')
+        for environ in environlist:
+            if environ["planet_id"] == self.id%10:
+                self.environment.addEnviron(environ)
+        #self.environment.addEnviron(1, 'W', 2, "Humans", "Animals", 'C')
+        #self.environment.addEnviron(2, 'U', 1, "Bricktons", "Animals", 'C')
+        #self.environment.addEnviron(3, 'F', 3, "Corruptons", "Animals", 'A')
 
     def update(self, move_dir=None, animate=None):
         self.prev_orient = self.orient

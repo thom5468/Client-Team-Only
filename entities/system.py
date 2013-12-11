@@ -4,18 +4,18 @@ from unit import Unit
 from planet import Planet
 
 class System():
-    def __init__(self, screen, background, animate=None, characterlist = None):
+    def __init__(self, screen, background, animate=None, characterlist = None, planetlist = None, environlist = None, militarylist = None):
         self.screen = screen
         self.background = background
-        self.id = 1
+        self.id = 22
         self.animate = animate
         self.move_dir = None
         #=======================================================================
         # Planet Population
         #=======================================================================
-        purple = Planet(self, 1, "purple", "left", "purple_planet.png")
-        earth = Planet(self, 2, "earth", "center", "earth_planet.png")
-        blue = Planet(self, 3, "blue", "right", "blue_planet.png")
+        purple = Planet(self, planetlist[0], environlist, "left", "purple_planet.png")
+        earth = Planet(self, planetlist[1], environlist, "center", "earth_planet.png")
+        blue = Planet(self, planetlist[2], environlist, "right", "blue_planet.png")
         self.planet_list = pygame.sprite.LayeredUpdates((purple, earth, blue))
         #=======================================================================
         # Unit Population
@@ -24,10 +24,14 @@ class System():
         self.unit_list = pygame.sprite.LayeredDirty()
         for character in characterlist:
             print character
-            self.addunit(character)
+            self.addunit(True, character)
+            
+        for milunit in militarylist:
+            print milunit
+            self.addunit(False, milunit)
 
-    def addunit (self, unitdict):
-        newunit = Unit(unitdict)
+    def addunit (self, charflag, unitdict):
+        newunit = Unit(charflag, unitdict)
         if len(self.unit_list) == 0:
             self.unit_list.add(newunit)
         else:

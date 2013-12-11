@@ -14,24 +14,29 @@ LINECOLOR = (0, 200, 0)
 
 
 class Environ():
-    def __init__(self, parent, center, iradius, oradius, idnumber, type, size, race, creature, politics):
+    #def __init__(self, parent, center, iradius, oradius, idnumber, type, size, race, creature, politics):
+    def __init__(self, parent, center, iradius, oradius, environdict):
         self.parent = parent
         self.rect = pygame.Rect(center[0] - oradius, center[1] - oradius, oradius * 2, oradius * 2)
-        self.id = idnumber
-        self.type = type
-        self.size = size
-        self.star_faring = star_faring
-        self.race = race
+        self.id = int(environdict["id"])
+        self.planet_id = environdict["planet_id"]
+        self.type = environdict["type"]
+        self.size = environdict["size"]
+        self.star_faring = environdict["star_faring"]
+        self.race_name = environdict["race_name"]
+        self.star_resources = environdict["star_resources"]
+        self.monster = environdict["monster"]
+        self.coup = environdict["coup"]
+        self.sov = environdict["sov"]
+        self.resources = environdict["resources"]
         
-        self.creature = creature
-        self.politics = politics
         self.startangle = STARTANGLE + (self.id * UNITANGLE)
         self.endangle = self.startangle + UNITANGLE
         self.iradius = iradius
         self.oradius = oradius
         self.averadius = (iradius + oradius) / 2
         self.center = center
-        self.getcolor(type)
+        self.getcolor(self.type)
         self.collision_points = []
         self.updatepoints()
 
@@ -95,9 +100,10 @@ class EnvironBox():
         self.environ_list = []
         self.envarc = pygame.Rect(planetrect.topleft[0] - 75, planetrect.topleft[1] - 75, planetrect.width + 150, planetrect.height + 150)
 
-    def addEnviron(self, idnumber, type, size, race, creature, politics):
+    #def addEnviron(self, idnumber, type, size, race, creature, politics):
+    def addEnviron(self, environdict):
         self.environ_list.append(Environ(self.parent, self.planet.center, self.planet.width / 2 + 50, self.planet.width / 2 + 150,
-                                         idnumber, type, size, race, creature, politics))
+                                         environdict)) #was alternate parameters
 
     def update(self):#unitlist
         for environ in self.environ_list:
