@@ -112,7 +112,7 @@ class System():
             loc_id = unit.loc_id
             unit.visible = 1
             while loc_id:
-                digits = int(log10(loc_id)) + 1
+                digits = len(str(loc_id))
                 if digits >= 3:
                     environ_id = loc_id % 10
                 elif digits >= 2:

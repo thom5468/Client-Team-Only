@@ -53,6 +53,8 @@ def main(client, setupinfo=None):
                     if selected_unit:
                         hover_unit = left_mouse_select_check(mouse_sel, star_system)
                         if hover_unit != selected_unit:
+                            #mergeresponse = client.root.merge_stack(unit.stack_id, selected_unit.stack_id)
+                            #if mergeresponse["Success"]:
                             selected_unit.add_unit(hover_unit)
                             star_system.unit_list.remove(hover_unit)
                     print "SPACE BAR"
@@ -70,6 +72,9 @@ def main(client, setupinfo=None):
                             hover_unit = star_system.unit_list.get_sprites_at(mouse_ptr.pos)
                             print "STACK REMOVING FROM", hover_unit
                             if hover_unit:
+                                #splitresponse = client.root.split_stack(hover_unit[0].stack_id, hover_unit[0].unit_list[-1].id)
+                                #if splitresponse["Success"]:
+                                #   sprite.set_stack_id(splitresponse["response"]["stack id"])
                                 sprite = hover_unit[0].remove_unit()
                                 if sprite:
                                     #splitresponse = client.root.split_stack(hover_unit[0].stack_id, sprite.id)
@@ -116,15 +121,17 @@ def left_mouse_select_check(mouse, star_system):
 def left_mouse_unselect_check(mouse, selected_unit, star_system):
     if selected_unit:
         for planet in star_system.planet_list:
+            new_location_id = (star_system.id*10 + planet.id) * 10
             if planet.collide_rect.colliderect(selected_unit.rect):
-                #moveresponse = client.root.move(stack_id=selected_unit.stack_id, location_id=(star_system.id * 10 + planet.id) * 10)
-                selected_unit.loc_id = (star_system.id * 10 + planet.id) * 10 #=moveresponse["response"]["location"]
+                #moveresponse = client.root.move(stack_id=selected_unit.stack_id, location_id=new_location_id)
+                selected_unit.loc_id = new_location_id #=moveresponse["response"]["location"]
                 return None
             for environ in planet.environment.environ_list:
+                location_id = location_id + environ.id
                 for point in environ.collision_points:
                     if selected_unit.rect.colliderect(pygame.Rect((point), (10, 10))):
-                        #moveresponse = client.root.move(stack_id=selected_unit.stack_id, location_id=(star_system.id * 10 + planet.id) * 10 + environ.id)
-                        selected_unit.loc_id = (star_system.id * 10 + planet.id) * 10 + environ.id #=moveresponse["response"]["location"]
+                        #moveresponse = client.root.move(stack_id=selected_unit.stack_id, location_id=new_location_id)
+                        selected_unit.loc_id = new_location_id #=moveresponse["response"]["location"]
                         return None
     '''    for unit in star_system.unit_list:
             if unit is not selected_unit:
