@@ -34,6 +34,10 @@ def main(client, setupinfo=None):
     # Object Initialization:
     #===========================================================================
     star_system = System(screen, background, animate)
+    characterresponse = client.root.get_state(object_id=0, object_type="Character")
+    #for character in characterresponse["response"]["Character"]:
+    #    star_system.addunit(character)
+    
     selected_unit = None
 
     while running:
@@ -109,16 +113,22 @@ def left_mouse_unselect_check(mouse, selected_unit, star_system):
     if selected_unit:
         for planet in star_system.planet_list:
             if planet.collide_rect.colliderect(selected_unit.rect):
-                #response = client.root.move(stack_id=selected_unit.id, game_name=gamename, location_id=(star_system.id * 10 + planet.id) * 10)
-                selected_unit.loc_id = (star_system.id * 10 + planet.id) * 10 ##process response
+                #moveresponse = client.root.move(stack_id=selected_unit.stack_id, location_id=(star_system.id * 10 + planet.id) * 10)
+                selected_unit.loc_id = (star_system.id * 10 + planet.id) * 10 #=moveresponse["response"]["location"]
                 return None
             for environ in planet.environment.environ_list:
                 for point in environ.collision_points:
                     if selected_unit.rect.colliderect(pygame.Rect((point), (10, 10))):
-                        #response = client.root.move(stack_id=selected_unit.id, game_name=gamename, location_id=(star_system.id * 10 + planet.id) * 10 + environ.id)
-                        selected_unit.loc_id = (star_system.id * 10 + planet.id) * 10 + environ.id ##process response
+                        #moveresponse = client.root.move(stack_id=selected_unit.stack_id, location_id=(star_system.id * 10 + planet.id) * 10 + environ.id)
+                        selected_unit.loc_id = (star_system.id * 10 + planet.id) * 10 + environ.id #=moveresponse["response"]["location"]
                         return None
-
+    '''    for unit in star_system.unit_list:
+            if unit is not selected_unit:
+                if unit.rect.colliderect(selected_unit.rect):
+                    mergeresponse = client.root.merge_stack(unit.stack_id, selected_unit.stack_id)
+                    if mergeresponse["Success"] == "True"
+                        unit.addunit(selected_unit)
+    '''
 
 class System():
     def __init__(self, screen, background, animate=None):
@@ -137,12 +147,20 @@ class System():
         #=======================================================================
         # Unit Population
         #=======================================================================
-        cis = Unit("cis", 110, 5466, "rebel_cis.jpg")
-        megathron = Unit("megathron", 123, 5467, "rebel_megathron.jpg")
-        vagabond = Unit("vagabond", 123, 5468, "imperial_vagabond.jpg")
-        viper = Unit("viper", 130, 5469, "imperial_viper.jpg")
+        cis = Unit("cis", 110, 5466, 1, "rebel_cis.jpg")
+        megathron = Unit("megathron", 123, 5467, 2, "rebel_megathron.jpg")
+        vagabond = Unit("vagabond", 123, 5468, 3, "imperial_vagabond.jpg")
+        viper = Unit("viper", 130, 5469, 4, "imperial_viper.jpg")
         self.unit_list = pygame.sprite.LayeredDirty((cis, megathron, vagabond, viper))
 
+    def addunit (self, unitdict):
+        newunit = Unit(unitdict["name"], 110, unitdict["id"], unitdict["stack_id"], unitdict["img"])
+        for unit in self.unit_list:
+            if newunit.stack_id == unit.stack_id:
+                unit.addunit(newunit)
+                break
+        self.unit_list.add(newunit)
+        
     def update(self):
         for planet in self.planet_list:
             planet.update()
@@ -301,66 +319,12 @@ class Planet(pygame.sprite.Sprite):
         else:
             self.rect.center = self.pos
             self.collide_rect.center = self.pos
-'''
-class Stack():
-    def __init__(self, stack_id, stack_location_id, unit_list, unit_ids)
-        self.id = stack_id
-        self.loc_id = stack_location_id
-        self.unit_list = unit_list
-        self.unit_ids = unit_ids
-        self.units = pygame.sprite.LayeredDirty(unit_list)
-        self.units.empty()
-        self.set_attributes()
-        self.pos = None
-        self.loc = None
-        self.rect = None
-        
-    def set_attributes(self):
-        self.prev_pos = self.pos
-        self.pos = units.sprites[0].pos
-        self.prev_loc = self.loc
-        self.loc = units.sprites[0].loc
-        self.prev_rect = self.rect
-        self.rect = units.sprites[0].rect
-    
-    def update_units(self, unit_ids ):
-        for unit in self.units.sprites():
-            if not unit_ids.contains(unit.id):
-                self.units.remove(unit)
-        for id in unit_ids:
-            for unit in self.unit_list.sprites:
-                if unit.id == id:
-                    if not self.units.has(unit)
-                        self.units.add(unit)
-            
-    def cascadechanges(self):
-        if self.prect is not self.rect:
-            self.prect = self.rect
-            self.rect = units[0].rect
-        if self.ppos is not self.pos:
-            self.ppos = self.pos
-            for unit in self.units.sprites():
-                unit.pos = self.pos
-        if self.ploc is not self.loc:
-            self.ploc = self.loc
-            for unit in self.units.sprites():
-                unit.loc = self.loc
-            
-    def update(self, unit_ids = self.unitids):
-        self.updateunits(unit_ids)
-        self.setattributes()
-        self.cascadechanges()
-        
-    def draw(screen):
-        self.units.draw()           
-    
-'''
-
 
 class Unit(pygame.sprite.DirtySprite):
-    def __init__(self, unit_name, unit_location_id, unit_id, image):
+    def __init__(self, unit_name, unit_location_id, unit_id, stack_id, image):
         self.name = unit_name
         self.id = unit_id
+        self.stack_id = stack_id
         self.loc_id = unit_location_id
         self.pos = None
         self.loc = None
@@ -371,6 +335,10 @@ class Unit(pygame.sprite.DirtySprite):
         self.stack_list = list()
         self.stack_list.append(self)
 
+    def set_stack_id (self, new_stack_id):
+        for unit in self.stack_list:
+            unit.stack_id = new_stack_id
+    
     def cycle_unit(self):
         if len(self.stack_list) > 1:
             sprite = self.stack_list.pop()
@@ -385,6 +353,7 @@ class Unit(pygame.sprite.DirtySprite):
         #sprite.loc_id = self.loc_id
         #sprite.pos = self.pos
         #sprite.loc = self.loc
+        sprite.set_stack_id(self.stack_id)
         self.stack_list.extend(sprite.stack_list)
         sprite.stack_list = list()
         for sprite in self.stack_list:
