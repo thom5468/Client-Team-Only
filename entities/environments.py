@@ -7,7 +7,7 @@ Created on Nov 28, 2013
 import pygame
 from math import pi, cos, sin
 
-ETcolors = {'U': (150, 150, 150), 'F': (200, 0, 0), 'W': (50, 150, 50)}
+ETcolors = {'U': (150, 150, 150), 'F': (200, 0, 0), 'W': (50, 150, 50), 'A': (225,225,225)}#, 'L': ()}
 STARTANGLE = pi / 2
 UNITANGLE = pi / 8
 LINECOLOR = (0, 200, 0)
