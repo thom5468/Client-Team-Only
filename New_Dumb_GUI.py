@@ -32,11 +32,10 @@ def main(client, setupinfo=None):
     #===========================================================================
     # Object Initialization:
     #===========================================================================
-    star_system = System(screen, background, animate)
-    characterresponse = client.root.get_state(object_id=0, object_type="Character")
-    print characterresponse
-    for character in characterresponse["response"]["Character"]:
-        star_system.addunit(character)
+    characterlist = client.root.get_state(object_id=0, object_type="Character")["response"]["Character"]
+    star_system = System(screen, background, animate, characterlist)
+    #print characterlist
+    
     
     selected_unit = None
 
