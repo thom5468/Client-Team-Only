@@ -9,10 +9,10 @@ c = client.root
 #for game in c.list_games()["response"]["games"]:
 #    print game["name"]
 
-c.start_game("test1", "bob1")
+#c.start_game("test1", "bob1")
     
-planets = c.get_state(object_type="Planet")["response"]["Planet"]
-environs = c.get_state(object_type="Environ")["response"]["Environ"]
-characters = c.get_state(object_type="Character")["response"]["Character"]
-units = c.get_state(object_type="Unit")["response"]["Unit"]
-stack = c.get_state(object_type="Stack")["response"]["Stack"]
+planets = c.get_state(object_type="Planet")#["response"]["Planet"]
+environs = c.get_state(object_type="Environ")#["response"]["Environ"]
+characters = c.get_state(object_type="Character")#["response"]["Character"]
+units = c.get_state(object_type="Unit")#["response"]["Unit"]
+stack = c.get_state(object_type="Stack")#["response"]["Stack"]
