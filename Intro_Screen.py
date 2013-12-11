@@ -71,6 +71,17 @@ def main ():
                             selectedtextbox.switchchar()
                             selectedtextbox = gametextbox
                             selectedtextbox.switchchar()
+                    elif event.key == pygame.K_RETURN:
+                        run = False
+                        #pygame.mixer.music.stop()
+                        playerscenario = setscenario(scenario.is_alt)
+                        playerside = setplayer( allegiance.is_alt)
+                        gamesetup = client.root.start_game(id=gametextbox.input, player=playertextbox.input) #, scenario=playerscenario, ai=single_player.is_alt)
+                        #print("Getting state of planets")
+                        #planet = client.root.get_state(object_id=1, object_type="Planet")
+                        #print planet
+                        #print gamesetup
+                        New_Dumb_GUI.main(client, gamesetup)
                     else:
                         selectedtextbox.addkey(event.key)
             elif event.type == pygame.MOUSEBUTTONDOWN:
