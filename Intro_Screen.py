@@ -23,7 +23,7 @@ def setplayer( sideflag):
 def main ():
     client = rpyc.connect("elegantgazelle.com", 55889, service.ClientService)
 
-    background = pygame.image.load("freedom_galaxy.jpg")
+    background = pygame.image.load("data/freedom_galaxy.jpg")
     #background = pygame.transform.scale(background, (389, 489))
 
     start = my_button('Start Game')
@@ -40,7 +40,7 @@ def main ():
     playerside = ''
     playerscenario = ''
 
-    pygame.mixer.music.load('starwars-maintheme.mp3') 
+    pygame.mixer.music.load('data/starwars-maintheme.mp3') 
     pygame.mixer.music.play(-1)
 
     clock = pygame.time.Clock()

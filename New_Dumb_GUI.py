@@ -5,7 +5,7 @@ Created on Nov 28, 2013
 '''
 
 import pygame
-#import buttons
+#from hud.buttons import
 import rpyc
 from sys import exit as sysexit
 from entities.system import System
