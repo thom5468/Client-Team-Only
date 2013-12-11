@@ -4,7 +4,7 @@ from unit import Unit
 from planet import Planet
 
 class System():
-    def __init__(self, screen, background, animate=None):
+    def __init__(self, screen, background, animate=None, characterlist = None):
         self.screen = screen
         self.background = background
         self.id = 1
@@ -20,20 +20,26 @@ class System():
         #=======================================================================
         # Unit Population
         #=======================================================================
-        #cis = Unit("cis", 110, 5466, 9, "rebel_cis.jpg")
-        #megathron = Unit("megathron", 123, 5467, 9, "rebel_megathron.jpg")
-        #agabond = Unit("vagabond", 123, 5468, 9, "imperial_vagabond.jpg")
-        #iper = Unit("viper", 130, 5469, 9, "imperial_viper.jpg")
+        
         self.unit_list = pygame.sprite.LayeredDirty()
+        for character in characterlist:
+            print character
+            self.addunit(character)
 
     def addunit (self, unitdict):
         newunit = Unit(unitdict)
-        for unit in self.unit_list:
-            if newunit.stack_id == unit.stack_id:
-                unit.add_unit(newunit)
-                break
-            else:
-                self.unit_list.add(newunit)
+        if len(self.unit_list) == 0:
+            self.unit_list.add(newunit)
+        else:
+            for unit in self.unit_list:
+                if newunit.stack_id == unit.stack_id:
+                    #print "Adding to stack"
+                    unit.add_unit(newunit)
+                    break
+                else:
+                    #print "New stack"
+                    self.unit_list.add(newunit)
+        
         
     def update(self):
         for planet in self.planet_list:
@@ -106,7 +112,7 @@ class System():
             loc_id = unit.loc_id
             unit.visible = 1
             while loc_id:
-                digits = int(log10(loc_id)) + 1
+                digits = len(str(loc_id))
                 if digits >= 3:
                     environ_id = loc_id % 10
                 elif digits >= 2:

@@ -4,7 +4,7 @@ import pygame
 
 def load_image(image, colorkey=None):
     path = os.path.join('data', image)
-    print path
+    #print path
     try:
         image = pygame.image.load(path)
     except pygame.error, message:

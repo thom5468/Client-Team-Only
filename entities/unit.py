@@ -23,7 +23,7 @@ class Unit(pygame.sprite.DirtySprite):
         self.homeworld = unitdict["homeworld"]
         self.detected = unitdict["detected"]
         self.captive = unitdict["captive"]
-        self.loc_id = 110
+        self.loc_id = 111
         self.pos = None
         self.loc = None
         pygame.sprite.DirtySprite.__init__(self)
