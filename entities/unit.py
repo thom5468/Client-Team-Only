@@ -95,5 +95,5 @@ class Unit(pygame.sprite.DirtySprite):
                 else:
                     self.rect.center = self.pos
             except:
-                print "ERROR:", self.name, "is drifting"
+                #print "ERROR:", self.name, "is drifting"
                 return
