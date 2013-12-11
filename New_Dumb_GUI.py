@@ -73,7 +73,12 @@ def main(client, setupinfo=None):
                             if hover_unit:
                                 sprite = hover_unit[0].remove_unit()
                                 if sprite:
+                                    #splitresponse = client.root.split_stack(hover_unit[0].stack_id, sprite.id)
+                                    #if splitresponse["Success"]:
+                                    #   sprite.set_stack_id(splitresponse["response"]["stack id"])
                                     star_system.unit_list.add(sprite)
+                                    #else:
+                                    #   hover_unit[0].add_unit(sprite)
                             print "SHIFT RIGHT CLICK"
                         else:
                             hover_unit = star_system.unit_list.get_sprites_at(mouse_ptr.pos)
@@ -126,8 +131,9 @@ def left_mouse_unselect_check(mouse, selected_unit, star_system):
             if unit is not selected_unit:
                 if unit.rect.colliderect(selected_unit.rect):
                     mergeresponse = client.root.merge_stack(unit.stack_id, selected_unit.stack_id)
-                    if mergeresponse["Success"] == "True"
-                        unit.addunit(selected_unit)
+                    if mergeresponse["Success"]:
+                        unit.add_unit(selected_unit)
+                        star_system.unit_list.remove(selected_unit)
     '''
 
 class System():
@@ -154,7 +160,7 @@ class System():
         self.unit_list = pygame.sprite.LayeredDirty((cis, megathron, vagabond, viper))
 
     def addunit (self, unitdict):
-        newunit = Unit(unitdict["name"], 110, unitdict["id"], unitdict["stack_id"], unitdict["img"])
+        newunit = Unit(unitdict["name"], 111, unitdict["id"], unitdict["stack_id"], unitdict["img"])
         for unit in self.unit_list:
             if newunit.stack_id == unit.stack_id:
                 unit.addunit(newunit)
