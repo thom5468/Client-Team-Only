@@ -34,6 +34,10 @@ def printthings(itemlist):
         for item in thing.items():
             print item
             print "-------------------"
+            
+def printids (itemlist):
+    for thing in itemlist:
+        print thing["id"]
         
 def move( stack, location ):
     return c.move('test1', stack, location)
