@@ -5,8 +5,11 @@ from support.loadimage import load_image
 
 class Planet(pygame.sprite.Sprite):
     def __init__(self, parent_system, planetdict, environlist, planet_orientation, image):
+        #print planetdict
         self.parent = parent_system
-        self.id = planetdict["location"]
+        #self.
+        self.location = planetdict["location"]
+        self.planet_id = planetdict["id"]
         self.name = planetdict["name"]
         self.pdb_state = planetdict["pdb_state"]
         self.loyalty = planetdict["loyalty"]
@@ -28,7 +31,8 @@ class Planet(pygame.sprite.Sprite):
         #=======================================================================
         self.environment = environments.EnvironBox(self, self.rect)
         for environ in environlist:
-            if environ["planet_id"] == self.id%10:
+            #print environ
+            if environ["planet_id"] == self.planet_id:
                 self.environment.addEnviron(environ)
         #self.environment.addEnviron(1, 'W', 2, "Humans", "Animals", 'C')
         #self.environment.addEnviron(2, 'U', 1, "Bricktons", "Animals", 'C')

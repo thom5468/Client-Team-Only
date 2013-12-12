@@ -117,15 +117,15 @@ class System():
             unit.visible = 1
             while loc_id:
                 digits = len(str(loc_id))
-                if digits >= 3:
+                if digits >= 4:
                     environ_id = loc_id % 10
-                elif digits >= 2:
+                elif digits >= 3:
                     planet_id = loc_id % 10
-                elif digits >= 1:
+                elif digits >= 2:
                     self.system_id = loc_id % 10
                 loc_id /= 10
             for planet in self.planet_list:
-                if planet.id == planet_id:
+                if planet.location%10 == planet_id:
                     if environ_id == 0:
                         unit.pos = None
                         unit.loc = planet.collide_rect

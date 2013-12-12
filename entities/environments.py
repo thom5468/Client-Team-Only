@@ -15,21 +15,22 @@ LINECOLOR = (0, 200, 0)
 
 class Environ():
     __slots__ = ['parent', 'rect', 'id', 'planet_id', 'type', 'size',
-                 'star_faring', 'race_name', 'star_resources',
+                 'star_faring', 'race_name', 'star_resources', 'location',
                  'monster', 'coup', 'sov', 'resources', 'startangle',
                  'endangle', 'iradius', 'oradius', 'averadius',
                  'center', 'collision_points', 'fillcolor', 'stacks']
     def __init__(self, parent, center, iradius, oradius, environdict):
+        print environdict
         self.parent = parent
         self.rect = pygame.Rect(center[0] - oradius, center[1] - oradius, oradius * 2, oradius * 2)
-        properties = ('id', 'planet_id', 'type', 'size' 'star_faring',
+        properties = ('planet_id', 'type', 'size', 'star_faring', 'location',
                       'race_name', 'star_resources', 'monster', 'coup', 'sov',
                       'resources')
         for prop in properties:
             setattr(self, prop, environdict[prop])
-        self.id = int(self.id)
-        self.startangle = STARTANGLE + (self.id * UNITANGLE)
-        self.endangle = self.startangle + UNITANGLE
+        self.id = int(environdict["id"])
+        self.startangle = STARTANGLE + (self.location * UNITANGLE)
+        self.endangle = self.startangle + UNITANGLE#*self.size
         self.iradius = iradius
         self.oradius = oradius
         self.averadius = (iradius + oradius) / 2
@@ -102,7 +103,7 @@ class EnvironBox():
     def addEnviron(self, environdict):
         self.environ_list.append(Environ(self.parent, self.planet.center, self.planet.width / 2 + 50, self.planet.width / 2 + 150,
                                          environdict)) #was alternate parameters
-
+        
     def update(self):#unitlist
         for environ in self.environ_list:
             environ.center = self.planet.center
@@ -111,7 +112,7 @@ class EnvironBox():
             if self.refresh:
                 for i in range(1, environ.size):
                     environ.expand1()
-                    for shift in self.environ_list[environ.id:]:
+                    for shift in self.environ_list[environ.location:]:
                         shift.shiftdown1()
         self.refresh = False
 

@@ -133,13 +133,13 @@ def left_mouse_select_check(mouse, star_system):
 def left_mouse_unselect_check(mouse, selected_unit, star_system):
     if selected_unit:
         for planet in star_system.planet_list:
-            new_location_id = planet.id * 10
+            new_location_id = planet.location * 10
             if planet.collide_rect.colliderect(selected_unit.rect):
                 #moveresponse = client.root.move(stack_id=selected_unit.stack_id, location_id=new_location_id)
                 selected_unit.loc_id = new_location_id #=moveresponse["response"]["location"]
                 return None
             for environ in planet.environment.environ_list:
-                new_location_id = new_location_id + environ.id
+                new_location_id = new_location_id + environ.location
                 for point in environ.collision_points:
                     if selected_unit.rect.colliderect(pygame.Rect((point), (10, 10))):
                         #moveresponse = client.root.move(stack_id=selected_unit.stack_id, location_id=new_location_id)
