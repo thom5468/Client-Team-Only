@@ -16,7 +16,7 @@ import hud.buttons as Menu_Buttons
 pygame.init()
 
 def main(client, setupinfo=None):
-    gameid = setupinfo["response"]["game"]["id"]
+    gameid = setupinfo["request"]["parameters"]["id"]
     height = 720
     width = 1024
     screensize = (width, height)
