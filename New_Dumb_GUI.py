@@ -11,11 +11,14 @@ from sys import exit as sysexit
 from entities.system import System
 from support.custommouse import MouseCursor
 from support.loadimage import load_image
+import hud.buttons as Menu_Buttons
 
 pygame.init()
 
 def main(client, setupinfo=None):
-    screensize = (1024, 720)
+    height = 720
+    width = 1024
+    screensize = (width, height)
     screen = pygame.display.set_mode(screensize)
     clock = pygame.time.Clock()
     pygame.mouse.set_visible(0)
@@ -38,6 +41,7 @@ def main(client, setupinfo=None):
     militarylist = client.root.get_state(object_type="Unit")["response"]["unit"]
     star_system = System(screen, background, animate, characterlist, planetlist, environlist, militarylist)
     #print characterlist
+    menu = Menu_Buttons.Menu(screen)
     
     
     selected_unit = None
@@ -69,6 +73,8 @@ def main(client, setupinfo=None):
                         # while the mouse button is down, change its cursor
                         mouse.remove(mouse_ptr)
                         mouse.add(mouse_sel)
+						#Button Flags
+                        menu.update_buttons(mouse_ptr.rect)
                     elif event.button == 3:
                         key_mod = pygame.key.get_mods()
                         if key_mod == 4097 or key_mod == 1:
@@ -106,6 +112,8 @@ def main(client, setupinfo=None):
             selected_unit.update(True)
         mouse.update()
         star_system.draw()
+		#Draw buttons and menus
+        menu.draw_buttons(screen, height, width, selected_unit)
         mouse.draw(screen)
         pygame.display.flip()
 

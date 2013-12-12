@@ -1,10 +1,12 @@
+#Joe Matranga
+
 import pygame
 
 
 class Button():
     def __init__(self):
         self.flag = False
-        self.rect = None
+        self.rect = pygame.Rect
 
     def create_button(self, surface, color, x, y, length, height, width, text, text_color):
         surface = self.draw_button(surface, color, length, height, x, y, width)
@@ -34,6 +36,7 @@ class Button():
         return surface
 
     def pressed(self, mouse_cursor):
+        #print "The mouse cursor is a :"+str(type(mouse_cursor))
         if self.rect.colliderect(mouse_cursor):
             return True
         else:
@@ -123,123 +126,85 @@ def render_textrect(string, font, rect, text_color, background_color, justificat
     return surface
 
 
-def update_buttons(mouse_cursor,
-                  LogStack, LogButton, CloseLogButton,
-                  DetailsButton, CloseDetailsButton,
-                  HelpButton, CloseHelpButton,
-                  MissionButton, CloseMissionButton,
-                  MissionCoup, MissionGI, MissionDip,
-                  MissionAssas, MissionSubvert, MissionScavenge,
-                  MissionCamp, MissionRebelion):
-
-    #If the Log button is pressed, then display the window
-    if LogButton.pressed(mouse_cursor):
-        LogButton.flag = True
-    elif CloseLogButton.pressed(mouse_cursor):
-        LogButton.flag = False
-    elif DetailsButton.pressed(mouse_cursor):
-        DetailsButton.flag = True
-    elif CloseDetailsButton.pressed(mouse_cursor):
-        DetailsButton.flag = False
-    elif HelpButton.pressed(mouse_cursor):
-        HelpButton.flag = True
-    elif CloseHelpButton.pressed(mouse_cursor):
-        HelpButton.flag = False
-    elif MissionButton.pressed(mouse_cursor):
-        MissionButton.flag = True
-    elif CloseMissionButton.pressed(mouse_cursor):
-        MissionButton.flag = False
-    elif MissionCoup.pressed(mouse_cursor):
-        #Send off request to Backend
-        LogStack.insert(0, "Coup Mission Selected")
-    elif MissionGI.pressed(mouse_cursor):
-        #Send off request to Backend
-        LogStack.insert(0, "Gather Information Mission Selected")
-    elif MissionDip.pressed(mouse_cursor):
-        #Send off request to Backend
-        LogStack.insert(0, "Diplomacy Mission Selected")
-    elif MissionAssas.pressed(mouse_cursor):
-        #Send off request to Backend
-        LogStack.insert(0, "Assasination Mission Selected")
-    elif MissionSubvert.pressed(mouse_cursor):
-        #Send off request to Backend
-        LogStack.insert(0, "Subvert Troops Mission Selected")
-    elif MissionScavenge.pressed(mouse_cursor):
-        #Send off request to Backend
-        LogStack.insert(0, "Scavenge Mission Selected")
-    elif MissionCamp.pressed(mouse_cursor):
-        #Send off request to Backend
-        LogStack.insert(0, "Start Rebel Camp Mission Selected")
-    elif MissionRebelion.pressed(mouse_cursor):
-        #Send off request to Backend
-        LogStack.insert(0, "Start/Stop Rebelion Mission Selected")
-
 
 #Draw menus and buttons based off of flag values
-def draw_buttons(screen, selectionlist,
-                LogStack, LogButton, CloseLogButton,
-                DetailsButton, CloseDetailsButton,
-                HelpButton, CloseHelpButton,
-                MissionButton, CloseMissionButton,
-                MissionCoup, MissionGI, MissionDip,
-                MissionAssas, MissionSubvert, MissionScavenge,
-                MissionCamp, MissionRebelion):
 
-    if(LogButton.flag == True):
-        #If LogFlag is set, then display the text window
-        #Format the output string
-        if(len(LogStack) > 10):
-            LogStack.pop()
-        Log_Message = ""
-        for item in LogStack:
-            Log_Message = Log_Message + str(item) + "\n"
-        log_font = pygame.font.Font(None, 15)
-        log_rect = pygame.Rect((0, 650, 300, 150))
-        rendered_text = render_textrect(Log_Message, log_font, log_rect, (216, 216, 216), (48, 48, 48), 0)
-        screen.blit(rendered_text, log_rect.topleft)
-        #Parameters:                 surface, color,       x,   y,  length, height, width, text,  text_color
-        CloseLogButton.create_button(screen, (255, 0, 0), 285,  655,    10,    10,   10,    "X", (0, 0, 0))
-    else:
-        LogButton.create_button(screen, (0, 255, 0), 10,  750,  100,  30,   0,  "Log   ", (255, 255, 255))
-    if(DetailsButton.flag == True):
-        details_rect = pygame.Rect((724, 650, 300, 150))
+
+class Menu():
+    def __init__(self, screen):
+        self.LogStack = []
+        self.LogButton = Button()
+        self.CloseLogButton = Button()
+        self.SearchButton = Button()
+        self.CombatButton = Button()
+        self.MissionButton = Button()
+        #self.HelpButton = Button()
+        #self.CloseHelpButton = Button()
+        #Initialize the hidden buttons
+        self.CloseLogButton.create_button(screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
+        
+    def draw_buttons(self, screen, height, width, selected_unit):
+        details_rect = pygame.Rect((width*0.325, height*0.85, width*0.35, height*0.2))
+        rect_11 = pygame.Rect((width*0.325, height*0.85, width*0.0875, height*0.1))
+        rect_12 = pygame.Rect((width*0.4125, height*0.85, width*0.0875, height*0.1))
+        rect_13 = pygame.Rect((width*0.5, height*0.85, width*0.0875, height*0.1))
+        rect_14 = pygame.Rect((width*0.5875, height*0.85, width*0.0875, height*0.1))
+        rect_21 = pygame.Rect((width*0.325, height*0.95, width*0.0875, height*0.1))
+        rect_22 = pygame.Rect((width*0.4125, height*0.95, width*0.0875, height*0.1))
+        rect_23 = pygame.Rect((width*0.5, height*0.95, width*0.0875, height*0.1))
+        rect_24 = pygame.Rect((width*0.5875, height*0.95, width*0.0875, height*0.1))
+        #prev_unit = None
+        LIGHT_GREY = (82,82,82)
+        if(self.LogButton.flag == True):
+            #If LogFlag is set, then display the text window
+            #Format the output string
+            if(len(self.LogStack) > 10):
+                self.LogStack.pop()
+            Log_Message = ""
+            for item in self.LogStack:
+                Log_Message = Log_Message + str(item) + "\n"
+            log_font = pygame.font.Font(None, 15)
+            log_rect = pygame.Rect((0, height * 0.82, width*0.29, height*0.18))
+            rendered_text = render_textrect(Log_Message, log_font, log_rect, (216, 216, 216), (48, 48, 48), 0)
+            screen.blit(rendered_text, log_rect.topleft)
+            #Parameters:                 surface, color,       x,             y,       length, height, width, text,  text_color
+            self.CloseLogButton.create_button(screen, (255, 0, 0), width*0.28,  height*0.82,    10,    10,   10,    "X", (0, 0, 0))
+        else:
+            self.LogButton.create_button(screen, LIGHT_GREY, width*0.01,  height*0.96,  width*0.097,  height*0.038,   0,  "Log   ", (255, 255, 255))
+            
+        self.SearchButton.create_button(screen, LIGHT_GREY, width*0.879,  height*0.86, width*0.1, height*0.04, 0, "Search", (255, 255, 255))
+        self.CombatButton.create_button(screen, LIGHT_GREY, width*0.879,  height*0.91, width*0.1, height*0.04, 0, "Combat", (255, 255, 255))
+        self.MissionButton.create_button(screen, LIGHT_GREY, width*0.879,  height*0.96, width*0.1, height*0.04, 0, "Mission", (255, 255, 255))
         pygame.draw.rect(screen, (48, 48, 48), details_rect)
-        #details_sub_rect = pygame.Rect((724, 635, 300, 135))
-        #detailScreen = screen.subsurface(details_sub_rect)
-        #tmpSel = selectionlist.sprites()
+        #Help Button and menu
+        #    if(self.HelpButton.flag == True):
+        #        Help_Message = "This text will change based on the current player phase"
+        #        help_bg = pygame.Rect((0, 0, width*0.292, height*0.38))
+        #        pygame.draw.rect(screen, (48, 48, 48), help_bg)
+        #        help_font = pygame.font.Font(None, 15)
+        #        help_rect = pygame.Rect((0, height*0.025, width*0.292, height*0.35))
+        #        rendered_text = render_textrect(Help_Message, help_font, help_rect, (216, 216, 216), (48, 48, 48), 0)
+        #        screen.blit(rendered_text, help_rect.topleft)
+        #        #Parameters:                 surface, color,       x,            y,            length, height, width, text,  text_color
+        #        CloseHelpButton.create_button(screen, (255, 0, 0), width*0.278,  height*0.006,    10,    10,   10,    "X", (0, 0, 0))
+        #    else:
+        #        HelpButton.create_button(screen, LIGHT_GREY, width*0.005,  height*0.006,  width*0.097,  height*0.038,   0,  "Help  ", (255, 255, 255))
+        
+        
 
-        #details_font = pygame.font.Font(None, 20)
-        #rendered_text = render_textrect("Details Placeholder", details_font, details_rect, (216, 216, 216), (48, 48, 48), 0)
-        #screen.blit(rendered_text, details_rect.midtop)
-        #Parameters:                     surface, color,       x,   y,   length, height, width, text,       text_color
-        CloseDetailsButton.create_button(screen, (255, 0, 0), 1010,  655,    10,    10,   10,    "X", (0, 0, 0))
-    else:
-        DetailsButton.create_button(screen, (0, 255, 0), 900,  750,    100,    30,   0,  "Details", (255, 255, 255))
-    if(MissionButton.flag == True):
-        mission_rect = pygame.Rect((330, 650, 350, 150))
-        pygame.draw.rect(screen, (48, 48, 48), mission_rect)
-        #Draw the mission select buttons
-        #Parameters:              surface, color,       x,   y,   length, height, width, text,       text_color
-        MissionCoup.create_button(screen, (0, 255, 0), 340,  665,    100,    30,   0,  "Coup   ", (255, 255, 255))
-        MissionGI.create_button(screen, (0, 255, 0), 455,  665,    100,    30,   0,  "Gather Info", (255, 255, 255))
-        MissionDip.create_button(screen, (0, 255, 0), 565,  665,    100,    30,   0,  "Diplomacy", (255, 255, 255))
-        MissionAssas.create_button(screen, (0, 255, 0), 340,  715,    100,    30,   0,  "Assasination", (255, 255, 255))
-        MissionSubvert.create_button(screen, (0, 0, 255), 455,  715,    100,    30,   0,  "Subvert ", (255, 255, 255))
-        MissionScavenge.create_button(screen, (0, 0, 255), 565,  715,    100,    30,   0,  "Scavenge", (255, 255, 255))
-        MissionCamp.create_button(screen, (0, 0, 255), 340,  755,    100,    30,   0,  "Start Camp", (255, 255, 255))
-        MissionRebelion.create_button(screen, (0, 255, 0), 455,  755,    210,    30,   0,  "Start/Stop Rebelion", (255, 255, 255))
-        CloseMissionButton.create_button(screen, (255, 0, 0), 665,  655,    10,    10,   10,    "X", (0, 0, 0))
-    else:
-        MissionButton.create_button(screen, (0, 255, 0), 475,  745,    100,    30,   20,  "Missions", (255, 255, 255))
-    if(HelpButton.flag == True):
-        Help_Message = "This text will change based on the current player phase"
-        help_bg = pygame.Rect((0, 0, 300, 30))
-        pygame.draw.rect(screen, (48, 48, 48), help_bg)
-        help_font = pygame.font.Font(None, 15)
-        help_rect = pygame.Rect((0, 20, 300, 280))
-        rendered_text = render_textrect(Help_Message, help_font, help_rect, (216, 216, 216), (48, 48, 48), 0)
-        screen.blit(rendered_text, help_rect.topleft)
-        #Parameters:                 surface, color,       x,   y,  length, height, width, text,  text_color
-        CloseHelpButton.create_button(screen, (255, 0, 0), 285,  5,    10,    10,   10,    "X", (0, 0, 0))
-    else:
-        HelpButton.create_button(screen, (0, 255, 0), 5,  5,  100,  30,   0,  "Help  ", (255, 255, 255))
+    def update_buttons(self, mouse_cursor):
+    
+        #If the Log button is pressed, then display the window
+        if self.LogButton.pressed(mouse_cursor):
+            self.LogButton.flag = True
+        elif self.CloseLogButton.pressed(mouse_cursor):
+            self.LogButton.flag = False
+        elif self.SearchButton.pressed(mouse_cursor):
+            self.SearchButton.flag = True
+            #Bring up Search Menu
+        elif self.CombatButton.pressed(mouse_cursor):
+            self.CombatButton.flag = True
+            #Bring up Combat Menu
+        elif self.MissionButton.pressed(mouse_cursor):
+            self.MissionButton.flag = True
+            #Bring up Mission Menu
