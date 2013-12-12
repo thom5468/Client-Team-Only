@@ -14,11 +14,26 @@ def startgame():
 def getstuff(value):
     if value == 'p':
         return c.get_state('test1', "Planet")["response"]["planet"]
-    if  value == 'e':
+    if value == 'e':
         return c.get_state('test1',"Environ")["response"]["environ"]
-    if  value == 'c':
+    if value == 'c':
         return c.get_state('test1', "Character")["response"]["character"]
-    if  value == 'u':
+    if value == 'u':
         return c.get_state('test1', "Unit")["response"]["unit"]
-    if  value == 's':
+    if value == 's':
         return c.get_state('test1', "Stack")["response"]["stack"]
+
+envs = getstuff('e')
+planets = getstuff('p')
+chars = getstuff('c')
+units = getstuff('u')
+stacks = getstuff('s')
+
+def printthings(itemlist):
+    for thing in itemlist:
+        for item in thing.items():
+            print item
+            print "-------------------"
+        
+def move( stack, location ):
+    return c.move('test1', stack, location)
