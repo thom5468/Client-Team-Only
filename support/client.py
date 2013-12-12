@@ -41,3 +41,6 @@ def printids (itemlist):
         
 def move( stack, location ):
     return c.move( stack_id = stack, location_id = location)
+    
+def csplit ( stack, char):
+    return c.split_stack ( stack_id = stack, character_id = char )
