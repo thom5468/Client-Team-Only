@@ -23,16 +23,16 @@ class System():
         
         self.unit_list = pygame.sprite.LayeredDirty()
         for character in characterlist:
-            print character
+            #print character
             self.addunit(True, character)
             
         for milunit in militarylist:
-            print milunit
+            #print milunit
             self.addunit(False, milunit)
         
         for stack in stacklist:
             for unit in self.unit_list:
-                if unit.stack_id == stack["id"]
+                if unit.stack_id == stack["id"]:
                     unit.set_environ_id(stack["environ_id"])
 
     def addunit (self, charflag, unitdict):

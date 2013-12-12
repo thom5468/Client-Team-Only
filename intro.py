@@ -1,5 +1,5 @@
 import pygame, string
-import New_Dumb_GUI
+import gui
 import rpyc
 import support.service as service
 from startscreen.textbox import my_textbox
@@ -81,7 +81,7 @@ def main ():
                         #planet = client.root.get_state(object_id=1, object_type="Planet")
                         #print planet
                         #print gamesetup
-                        New_Dumb_GUI.main(client, gamesetup)
+                        gui.main(client, gamesetup)
                     else:
                         selectedtextbox.addkey(event.key)
             elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -90,12 +90,12 @@ def main ():
                     #pygame.mixer.music.stop()
                     playerscenario = setscenario(scenario.is_alt)
                     playerside = setplayer( allegiance.is_alt)
-                    gamesetup = client.root.start_game(id=gametextbox.input, player=playertextbox.input) #, scenario=playerscenario, ai=single_player.is_alt)
+                    #gamesetup = client.root.start_game(id='test1', player=playertextbox.input) #id=gametextbox.input, scenario=playerscenario, ai=single_player.is_alt)
                     #print("Getting state of planets")
                     #planet = client.root.get_state(object_id=1, object_type="Planet")
                     #print planet
                     #print gamesetup
-                    New_Dumb_GUI.main(client, gamesetup)
+                    gui.main(client)#, gamesetup)
                     #fire request to server
                     print('my_button start game clicked')
                 elif join.obj.collidepoint(mouse):
@@ -138,9 +138,9 @@ def main ():
                             #pygame.mixer.music.stop()
                             playerscenario = setscenario(scenario.is_alt)
                             playerside = setplayer( allegiance.is_alt)
-                            gamesetup = client.root.join_game(name=gametextbox.input, player=playertextbox.input) #scenario=playerscenario
+                            gamesetup = client.root.join_game(id=gametextbox.input, player=playertextbox.input) #scenario=playerscenario
                             print gamesetup
-                            New_Dumb_GUI.main(gamesetup)
+                            gui.main(gamesetup, client)
                         elif listingbox.refreshbutton.obj.collidepoint(mouse):
                             gamelisting = gamelistasync()
                         elif listingbox.gamebox.collidepoint(mouse):
@@ -162,7 +162,7 @@ def main ():
                     listingbox.drawloading(screen)
             single_player.is_alt = True
             if listingbox.selectedgame is not None:
-                gametextbox.input = listingbox.selectedgame["name"]
+                gametextbox.input = str(listingbox.selectedgame["id"])
                 gametextbox.text = list(gametextbox.input)
                 scenario.is_alt = listingbox.scenarioflag
                 

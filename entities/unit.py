@@ -12,7 +12,7 @@ class Unit(pygame.sprite.DirtySprite):
                  'prev_image', 'dirty', 'stack_list', 'environ_id']
     def __init__(self, charflag, unitdict):
         pygame.sprite.DirtySprite.__init__(self)
-        for prop in ['id', 'stack_id', 'side', 'endurance']:#, 'environ_id']:
+        for prop in ['id', 'stack_id', 'side']:#, 'environ_id']:
             setattr(self, prop, unitdict[prop])
         
         if charflag is False:

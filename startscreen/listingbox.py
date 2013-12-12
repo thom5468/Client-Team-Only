@@ -89,7 +89,7 @@ class gamelistingbox:
         for index, game in enumerate(gamedict['response']['games']):
             if index < 10:
                 self.gamelist.append(game)
-                self.namelist.append((self.label(game["name"], self.fontsize), (self.x+4, self.y+4+((index+1)*self.fontsize))))
+                self.namelist.append((self.label(game["id"], self.fontsize), (self.x+4, self.y+4+((index+1)*self.fontsize))))
                 self.playerlist.append((self.label(game["player1"], self.fontsize), (self.x+154, self.y+4+((index+1)*self.fontsize))))
                 self.scenariolist.append((self.label(game["scenario"], self.fontsize), (self.x+404, self.y+4+((index+1)*self.fontsize))))
                 #self.sidelist.append((self.label(game["allegiance"], self.fontsize), (self.x+304, self.y+4+((index+1)*self.fontsize)))

@@ -16,7 +16,7 @@ import hud.buttons as Menu_Buttons
 pygame.init()
 
 def main(client, setupinfo=None):
-    gameid = setupinfo["request"]["parameters"]["id"]
+    gameid = 'test1'#setupinfo["request"]["parameters"]["id"]
     height = 720
     width = 1024
     screensize = (width, height)
@@ -60,7 +60,7 @@ def main(client, setupinfo=None):
             if not mouse_ptr.down:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     if selected_unit:
-                        hover_unit = left_mouse_select_check(mouse_sel, star_system)
+                        hover_unit = left_mouse_select_check(client, mouse_sel, star_system)
                         if hover_unit != selected_unit:
                             #mergeresponse = client.root.merge_stack(unit.stack_id, selected_unit.stack_id)
                             #if mergeresponse["Success"]:
@@ -71,7 +71,7 @@ def main(client, setupinfo=None):
                     if event.button == 1:
                         mouse_ptr.pressed = mouse_sel.pressed = True
                         mouse_ptr.released = mouse_sel.released = False
-                        selected_unit = left_mouse_select_check(mouse_ptr, star_system)
+                        selected_unit = left_mouse_select_check(client, mouse_ptr, star_system)
                         # while the mouse button is down, change its cursor
                         mouse.remove(mouse_ptr)
                         mouse.add(mouse_sel)
@@ -103,7 +103,7 @@ def main(client, setupinfo=None):
 
             if event.type == pygame.MOUSEBUTTONUP:
                 mouse_ptr.released = mouse_sel.released = True
-                selected_unit = left_mouse_unselect_check(mouse, selected_unit, star_system)
+                selected_unit = left_mouse_unselect_check(client, mouse, selected_unit, star_system)
                 # while the mouse button is up, change its cursor
                 mouse.remove(mouse_sel)
                 mouse.add(mouse_ptr)
@@ -120,7 +120,7 @@ def main(client, setupinfo=None):
         pygame.display.flip()
 
 
-def left_mouse_select_check(mouse, star_system):
+def left_mouse_select_check(client, mouse, star_system):
     for unit in star_system.unit_list:
         if unit.rect.collidepoint(mouse.pos) and unit.visible == 1:
             star_system.unit_list.move_to_front(unit)
@@ -131,7 +131,7 @@ def left_mouse_select_check(mouse, star_system):
             return None
 
 
-def left_mouse_unselect_check(mouse, selected_unit, star_system):
+def left_mouse_unselect_check(client, mouse, selected_unit, star_system):
     if selected_unit:
         for planet in star_system.planet_list:
             new_location_id = planet.location * 10
@@ -145,7 +145,8 @@ def left_mouse_unselect_check(mouse, selected_unit, star_system):
                 for point in environ.collision_points:
                     if selected_unit.rect.colliderect(pygame.Rect((point), (10, 10))):
                         moveresponse = client.root.move(stack_id=selected_unit.stack_id, location_id=environ.id)
-                        if moveresponse["response"]["success"]:
+                        print moveresponse
+                        if moveresponse["request"]["success"] is True:
                             selected_unit.set_loc_id (new_location_id )
                             selected_unit.set_environ_id (new_environ_id)
                         return None

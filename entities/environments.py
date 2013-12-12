@@ -20,7 +20,7 @@ class Environ():
                  'endangle', 'iradius', 'oradius', 'averadius',
                  'center', 'collision_points', 'fillcolor', 'stacks']
     def __init__(self, parent, center, iradius, oradius, environdict):
-        print environdict
+        #print environdict
         self.parent = parent
         self.rect = pygame.Rect(center[0] - oradius, center[1] - oradius, oradius * 2, oradius * 2)
         properties = ('planet_id', 'type', 'size', 'star_faring', 'location', 'id',
