@@ -12,13 +12,13 @@ def startgame():
     c.start_game("test1", "bob1")
     
 def getstuff(value):
-    if value = 'p':
+    if value == 'p':
         return c.get_state('test1', "Planet")["response"]["planet"]
-    if  value = 'e':
+    if  value == 'e':
         return c.get_state('test1',"Environ")["response"]["environ"]
-    if  value = 'c':
+    if  value == 'c':
         return c.get_state('test1', "Character")["response"]["character"]
-    if  value = 'u':
+    if  value == 'u':
         return c.get_state('test1', "Unit")["response"]["unit"]
-    if  value = 's':
+    if  value == 's':
         return c.get_state('test1', "Stack")["response"]["stack"]
