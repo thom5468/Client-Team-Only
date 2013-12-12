@@ -23,11 +23,12 @@ def getstuff(value):
     if value == 's':
         return c.get_state('test1', "Stack")["response"]["stack"]
 
-envs = getstuff('e')
-planets = getstuff('p')
-chars = getstuff('c')
-units = getstuff('u')
-stacks = getstuff('s')
+def getall():
+    envs = getstuff('e')
+    planets = getstuff('p')
+    chars = getstuff('c')
+    units = getstuff('u')
+    stacks = getstuff('s')
 
 def printthings(itemlist):
     for thing in itemlist:
