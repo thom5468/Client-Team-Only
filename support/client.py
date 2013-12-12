@@ -40,4 +40,4 @@ def printids (itemlist):
         print thing["id"]
         
 def move( stack, location ):
-    return c.move(game_id ='test1', stack_id = stack, location_id = location)
+    return c.move( stack_id = stack, location_id = location)
