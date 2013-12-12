@@ -3,6 +3,13 @@ from support.loadimage import load_image
 
 
 class Unit(pygame.sprite.DirtySprite):
+    __slots__ = ['id', 'stack_id', 'side', 'endurance', 'charflag',
+                 'name', 'mobile', 'environ_combat', 'space_combat',
+                 'image', 'rect', 'detected', 'wounds', 'active',
+                 'bonuses', 'title', 'race', 'combat', 'intelligence',
+                 'leadership', 'diplomacy', 'navigation', 'homeworld',
+                 'detected', 'captive' 'loc_id', 'pos', 'loc',
+                 'prev_image', 'dirty', 'stack_list']
     def __init__(self, charflag, unitdict):
         pygame.sprite.DirtySprite.__init__(self)
         self.id = unitdict["id"]
@@ -19,22 +26,13 @@ class Unit(pygame.sprite.DirtySprite):
             self.image, self.rect = load_image("DrJ.png")
             
         if charflag is True:
-            self.name = unitdict["name"]
-            self.detected = unitdict["detected"]
-            self.wounds = unitdict["wounds"]
-            self.active = unitdict["active"]
-            self.bonuses = unitdict["bonuses"]
-            self.title = unitdict["title"]
-            self.race = unitdict["race"]
-            self.combat = unitdict["combat"]
-            self.intelligence = unitdict["intelligence"]
-            self.leadership = unitdict["leadership"]
-            self.diplomacy = unitdict["diplomacy"]
-            self.navigation = unitdict["navigation"]
-            self.homeworld = unitdict["homeworld"]
-            self.detected = unitdict["detected"]
-            self.captive = unitdict["captive"]
-            self.image, self.rect = load_image(unitdict["img"])
+            properties = ('name', 'detected', 'wounds', 'active',
+                          'bonuses', 'title', 'race', 'combat', 'intelligence',
+                          'leadership', 'diplomacy', 'navigation', 'homeworld',
+                          'detected', 'captive')
+            for prop in properties:
+                setattr(self, prop, unitdict[prop])
+            self.image, self.rect = load_image(unitdict["img"]) 
         self.loc_id = 111
         self.pos = None
         self.loc = None
