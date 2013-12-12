@@ -6,4 +6,5 @@ client = rpyc.connect("elegantgazelle.com", 55889, service.ClientService, config
 c = client.root
 
 for game in c.list_games()["response"]["games"]:
-    c.delete_game(game["id"])
+    print game["id"]
+    c.delete_game(str(game["id"]))
