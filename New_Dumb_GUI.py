@@ -40,7 +40,8 @@ def main(client, setupinfo=None):
     planetlist = client.root.get_state(game_id = gameid, object_type="Planet")["response"]["planet"]
     environlist = client.root.get_state(game_id = gameid, object_type="Environ")["response"]["environ"]
     militarylist = client.root.get_state(game_id = gameid, object_type="Unit")["response"]["unit"]
-    star_system = System(screen, background, animate, characterlist, planetlist, environlist, militarylist)
+    stacklist = client.root.get_state(game_id = gameid, object_type="Stack")["response"]["stack"]
+    star_system = System(screen, background, animate, characterlist, planetlist, environlist, militarylist, stacklist)
     #print characterlist
     menu = Menu_Buttons.Menu(screen)
     
@@ -135,15 +136,18 @@ def left_mouse_unselect_check(mouse, selected_unit, star_system):
         for planet in star_system.planet_list:
             new_location_id = planet.location * 10
             if planet.collide_rect.colliderect(selected_unit.rect):
-                moveresponse = client.root.move(stack_id=selected_unit.stack_id, location_id=new_location_id)
+                #moveresponse = client.root.move(stack_id=selected_unit.stack_id, location_id=new_location_id)
                 selected_unit.loc_id = new_location_id #=moveresponse["response"]["location"]
                 return None
             for environ in planet.environment.environ_list:
                 new_location_id = new_location_id + environ.location
+                new_environ_id = environ.id
                 for point in environ.collision_points:
                     if selected_unit.rect.colliderect(pygame.Rect((point), (10, 10))):
-                        #moveresponse = client.root.move(stack_id=selected_unit.stack_id, location_id=new_location_id)
-                        selected_unit.loc_id = new_location_id #=moveresponse["response"]["location"]
+                        moveresponse = client.root.move(stack_id=selected_unit.stack_id, location_id=environ.id)
+                        if moveresponse["response"]["success"]:
+                            selected_unit.set_loc_id (new_location_id )
+                            selected_unit.set_environ_id (new_environ_id)
                         return None
     '''    for unit in star_system.unit_list:
             if unit is not selected_unit:

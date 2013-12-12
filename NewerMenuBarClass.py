@@ -31,8 +31,8 @@ lightbluecolor = (100,149,237)
 
 #Marks the position of the Menu Bar relative to the master background screen
 MenuBarUpperLeftCorner = (90,0) # For test purposes. The final product will pass these coordinates into the initialization
-x = MenuBarUpperLeftCorner[0]
-y = MenuBarUpperLeftCorner[1]
+x = MenuBarUpperLeftCorner[0] # take out
+y = MenuBarUpperLeftCorner[1] #take out
 
 #Planet Names for testing purposes
 planetname = "NameofPlanet" 
@@ -43,13 +43,13 @@ planet4name = "planet1"
 planet5name = "planet2"
 
 #planet
-planetposition = (600, 70)
+planetposition = (600, 70) #(x+510, y+70)
 planettextcolor = (0,0,0)
 planetnameposition = (x+445,y+100)
 
 #pdb box
-pdbupcolor = (52, 243, 14)
-pdbdowncolor = (243,14,14)
+pdbupcolor = (52, 243, 14) # not used
+pdbdowncolor = redcolor
 pdbbox = (x+10,y+30,100,100)
 pdbboxpostion = (x+10,y+30)
 pdbstatustextcolor = (34,34,34)

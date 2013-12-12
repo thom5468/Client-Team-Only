@@ -8,22 +8,22 @@ class Unit(pygame.sprite.DirtySprite):
                  'image', 'rect', 'detected', 'wounds', 'active',
                  'bonuses', 'title', 'race', 'combat', 'intelligence',
                  'leadership', 'diplomacy', 'navigation', 'homeworld',
-                 'detected', 'captive' 'loc_id', 'pos', 'loc',
-                 'prev_image', 'dirty', 'stack_list']
+                 'detected', 'captive' 'loc_id', 'pos', 'loc', 'stack_id',
+                 'prev_image', 'dirty', 'stack_list', 'environ_id']
     def __init__(self, charflag, unitdict):
         pygame.sprite.DirtySprite.__init__(self)
-        for prop in ['id', 'stack_id', 'side', 'endurance']:
+        for prop in ['id', 'stack_id', 'side', 'endurance']:#, 'environ_id']:
             setattr(self, prop, unitdict[prop])
         
         if charflag is False:
             self.charflag = charflag
             self.name = unitdict["type"]
-            for prop in ['mobile', 'environ_combat', 'space_combat']:
+            for prop in ['mobile', 'environ_combat', 'space_combat', 'stack_id']:
                 setattr(self, prop, unitdict[prop])
             self.image, self.rect = load_image("DrJ.png")
             
         if charflag is True:
-            properties = ('name', 'detected', 'wounds', 'active',
+            properties = ('name', 'detected', 'wounds', 'active', 'stack_id',
                           'bonuses', 'title', 'race', 'combat', 'intelligence',
                           'leadership', 'diplomacy', 'navigation', 'homeworld',
                           'detected', 'captive')
@@ -41,6 +41,14 @@ class Unit(pygame.sprite.DirtySprite):
     def set_stack_id (self, new_stack_id):
         for unit in self.stack_list:
             unit.stack_id = new_stack_id
+            
+    def set_loc_id (self, new_loc_id):
+        for unit in self.stack_list:
+            unit.loc_id = new_loc_id
+            
+    def set_environ_id (self, new_environ_id):
+        for unit in self.stack_list:
+            unit.environ_id = new_environ_id
     
     def cycle_unit(self):
         if len(self.stack_list) > 1:

@@ -4,7 +4,7 @@ from unit import Unit
 from planet import Planet
 
 class System():
-    def __init__(self, screen, background, animate=None, characterlist = None, planetlist = None, environlist = None, militarylist = None):
+    def __init__(self, screen, background, animate=None, characterlist=None, planetlist=None, environlist=None, militarylist=None, stacklist=None):
         self.screen = screen
         self.background = background
         self.id = 22
@@ -29,9 +29,16 @@ class System():
         for milunit in militarylist:
             print milunit
             self.addunit(False, milunit)
+        
+        for stack in stacklist:
+            for unit in self.unit_list:
+                if unit.stack_id == stack["id"]
+                    unit.set_environ_id(stack["environ_id"])
 
     def addunit (self, charflag, unitdict):
         newunit = Unit(charflag, unitdict)
+        self.unit_list.add(newunit)
+        
         if len(self.unit_list) == 0:
             self.unit_list.add(newunit)
         else:
