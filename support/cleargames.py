@@ -7,4 +7,5 @@ c = client.root
 
 for game in c.list_games()["response"]["games"]:
     print game["id"]
-    c.delete_game(str(game["id"]))
+    if str(game["id"]) != "test1":
+        c.delete_game(str(game["id"]))
