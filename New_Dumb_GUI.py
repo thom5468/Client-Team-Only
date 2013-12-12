@@ -16,6 +16,7 @@ import hud.buttons as Menu_Buttons
 pygame.init()
 
 def main(client, setupinfo=None):
+    gameid = setupinfo["response"]["game"]["id"]
     height = 720
     width = 1024
     screensize = (width, height)
@@ -35,10 +36,10 @@ def main(client, setupinfo=None):
     #===========================================================================
     # Object Initialization:
     #===========================================================================
-    characterlist = client.root.get_state(object_type="Character")["response"]["character"]
-    planetlist = client.root.get_state(object_type="Planet")["response"]["planet"]
-    environlist = client.root.get_state(object_type="Environ")["response"]["environ"]
-    militarylist = client.root.get_state(object_type="Unit")["response"]["unit"]
+    characterlist = client.root.get_state(game_id = gameid, object_type="Character")["response"]["character"]
+    planetlist = client.root.get_state(game_id = gameid,object_type="Planet")["response"]["planet"]
+    environlist = client.root.get_state(game_id = gameid,object_type="Environ")["response"]["environ"]
+    militarylist = client.root.get_state(game_id = gameid,object_type="Unit")["response"]["unit"]
     star_system = System(screen, background, animate, characterlist, planetlist, environlist, militarylist)
     #print characterlist
     menu = Menu_Buttons.Menu(screen)
