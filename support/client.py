@@ -33,7 +33,7 @@ def printthings(itemlist):
     for thing in itemlist:
         for item in thing.items():
             print item
-            print "-------------------"
+        print "-------------------"
             
 def printids (itemlist):
     for thing in itemlist:
