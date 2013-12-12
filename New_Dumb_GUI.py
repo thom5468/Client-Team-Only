@@ -74,7 +74,7 @@ def main(client, setupinfo=None):
                         # while the mouse button is down, change its cursor
                         mouse.remove(mouse_ptr)
                         mouse.add(mouse_sel)
-						#Button Flags
+						#Update Buttons and menu status
                         menu.update_buttons(mouse_ptr.rect)
                     elif event.button == 3:
                         key_mod = pygame.key.get_mods()

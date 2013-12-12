@@ -132,49 +132,51 @@ def render_textrect(string, font, rect, text_color, background_color, justificat
 
 class Menu():
     def __init__(self, screen):
-        self.LogStack = []
-        self.LogButton = Button()
-        self.CloseLogButton = Button()
-        self.SearchButton = Button()
-        self.CombatButton = Button()
-        self.MissionButton = Button()
+        self.Log_Stack = []
+        self.Log_Button = Button()
+        self.Close_Log_Button = Button()
+        self.Search_Button = Button()
+        self.Combat_Button = Button()
+        self.Mission_Button = Button()
         #self.HelpButton = Button()
         #self.CloseHelpButton = Button()
         #Initialize the hidden buttons
-        self.CloseLogButton.create_button(screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
+        self.Close_Log_Button.create_button(screen, (255, 0, 0), 0,  0,    0,    0,   0,    "X", (0, 0, 0))
         
     def draw_buttons(self, screen, height, width, selected_unit):
-        details_rect = pygame.Rect((width*0.325, height*0.85, width*0.35, height*0.2))
-        rect_11 = pygame.Rect((width*0.325, height*0.85, width*0.0875, height*0.1))
-        rect_12 = pygame.Rect((width*0.4125, height*0.85, width*0.0875, height*0.1))
-        rect_13 = pygame.Rect((width*0.5, height*0.85, width*0.0875, height*0.1))
-        rect_14 = pygame.Rect((width*0.5875, height*0.85, width*0.0875, height*0.1))
-        rect_21 = pygame.Rect((width*0.325, height*0.95, width*0.0875, height*0.1))
-        rect_22 = pygame.Rect((width*0.4125, height*0.95, width*0.0875, height*0.1))
-        rect_23 = pygame.Rect((width*0.5, height*0.95, width*0.0875, height*0.1))
-        rect_24 = pygame.Rect((width*0.5875, height*0.95, width*0.0875, height*0.1))
-        #prev_unit = None
+        detail_width = width*0.325
+        detail_height = height*0.85
+        details_rect = pygame.Rect((detail_width, detail_height, width*0.35, height*0.2))
+        rect_11 = pygame.Rect((detail_width, detail_height, 50, 50))
+        rect_12 = pygame.Rect(((detail_width)+50, detail_height, 50, 50))
+        rect_13 = pygame.Rect(((detail_width)+100, detail_height, 50, 50))
+        rect_14 = pygame.Rect(((detail_width)+150, detail_height, 50, 50))
+        rect_21 = pygame.Rect((detail_width, (detail_height)+50, 50, 50))
+        rect_22 = pygame.Rect(((detail_width)+50, (detail_height)+50, 50, 50))
+        rect_23 = pygame.Rect(((detail_width)+50, (detail_height)+50, 50, 50))
+        rect_24 = pygame.Rect(((detail_width)+50, (detail_height)+50, 50, 50))
+        prev_unit = None
         LIGHT_GREY = (82,82,82)
-        if(self.LogButton.flag == True):
+        if(self.Log_Button.flag == True):
             #If LogFlag is set, then display the text window
             #Format the output string
-            if(len(self.LogStack) > 10):
-                self.LogStack.pop()
+            if(len(self.Log_Stack) > 10):
+                self.Log_Stack.pop()
             Log_Message = ""
-            for item in self.LogStack:
+            for item in self.Log_Stack:
                 Log_Message = Log_Message + str(item) + "\n"
             log_font = pygame.font.Font(None, 15)
             log_rect = pygame.Rect((0, height * 0.82, width*0.29, height*0.18))
             rendered_text = render_textrect(Log_Message, log_font, log_rect, (216, 216, 216), (48, 48, 48), 0)
             screen.blit(rendered_text, log_rect.topleft)
             #Parameters:                 surface, color,       x,             y,       length, height, width, text,  text_color
-            self.CloseLogButton.create_button(screen, (255, 0, 0), width*0.28,  height*0.82,    10,    10,   10,    "X", (0, 0, 0))
+            self.Close_Log_Button.create_button(screen, (255, 0, 0), width*0.28,  height*0.82,    10,    10,   10,    "X", (0, 0, 0))
         else:
-            self.LogButton.create_button(screen, LIGHT_GREY, width*0.01,  height*0.96,  width*0.097,  height*0.038,   0,  "Log   ", (255, 255, 255))
+            self.Log_Button.create_button(screen, LIGHT_GREY, width*0.01,  height*0.96,  width*0.097,  height*0.038,   0,  "Log   ", (255, 255, 255))
             
-        self.SearchButton.create_button(screen, LIGHT_GREY, width*0.879,  height*0.86, width*0.1, height*0.04, 0, "Search", (255, 255, 255))
-        self.CombatButton.create_button(screen, LIGHT_GREY, width*0.879,  height*0.91, width*0.1, height*0.04, 0, "Combat", (255, 255, 255))
-        self.MissionButton.create_button(screen, LIGHT_GREY, width*0.879,  height*0.96, width*0.1, height*0.04, 0, "Mission", (255, 255, 255))
+        self.Search_Button.create_button(screen, LIGHT_GREY, width*0.879,  height*0.86, width*0.1, height*0.04, 0, "Search", (255, 255, 255))
+        self.Combat_Button.create_button(screen, LIGHT_GREY, width*0.879,  height*0.91, width*0.1, height*0.04, 0, "Combat", (255, 255, 255))
+        self.Mission_Button.create_button(screen, LIGHT_GREY, width*0.879,  height*0.96, width*0.1, height*0.04, 0, "Mission", (255, 255, 255))
         pygame.draw.rect(screen, (48, 48, 48), details_rect)
         #Help Button and menu
         #    if(self.HelpButton.flag == True):
@@ -189,22 +191,56 @@ class Menu():
         #        CloseHelpButton.create_button(screen, (255, 0, 0), width*0.278,  height*0.006,    10,    10,   10,    "X", (0, 0, 0))
         #    else:
         #        HelpButton.create_button(screen, LIGHT_GREY, width*0.005,  height*0.006,  width*0.097,  height*0.038,   0,  "Help  ", (255, 255, 255))
+        if (selected_unit):
+            if (prev_unit != selected_unit):
+                prev_unit = selected_unit
         
+        i = 0
+        if (prev_unit):
+            for unit in selected_unit.stack_list:
+                if (i == 0):
+                    screen.blit(unit.image, rect_11)
+                    break;
+                elif (i == 1):
+                    screen.blit(unit.image, rect_12)
+                    break;
+                elif (i == 2):
+                    screen.blit(unit.image, rect_13)
+                    break;
+                elif (i == 3):
+                    screen.blit(unit.image, rect_14)
+                    break;
+                elif (i == 4):
+                    screen.blit(unit.image, rect_21)
+                    break;
+                elif (i == 5):
+                    screen.blit(unit.image, rect_22)
+                    break;
+                elif (i == 6):
+                    screen.blit(unit.image, rect_23)
+                    break;
+                elif (i == 7):
+                    screen.blit(unit.image, rect_24) 
+                    break;
+                else:
+                    print "ERROR: Too many units to display"
+     
+                i += 1
         
 
     def update_buttons(self, mouse_cursor):
     
         #If the Log button is pressed, then display the window
-        if self.LogButton.pressed(mouse_cursor):
-            self.LogButton.flag = True
-        elif self.CloseLogButton.pressed(mouse_cursor):
-            self.LogButton.flag = False
-        elif self.SearchButton.pressed(mouse_cursor):
-            self.SearchButton.flag = True
+        if self.Log_Button.pressed(mouse_cursor):
+            self.Log_Button.flag = True
+        elif self.Close_Log_Button.pressed(mouse_cursor):
+            self.Log_Button.flag = False
+        elif self.Search_Button.pressed(mouse_cursor):
+            self.Search_Button.flag = True
             #Bring up Search Menu
-        elif self.CombatButton.pressed(mouse_cursor):
-            self.CombatButton.flag = True
+        elif self.Combat_Button.pressed(mouse_cursor):
+            self.Combat_Button.flag = True
             #Bring up Combat Menu
-        elif self.MissionButton.pressed(mouse_cursor):
-            self.MissionButton.flag = True
+        elif self.Mission_Button.pressed(mouse_cursor):
+            self.Mission_Button.flag = True
             #Bring up Mission Menu
