@@ -14,22 +14,20 @@ LINECOLOR = (0, 200, 0)
 
 
 class Environ():
-    #def __init__(self, parent, center, iradius, oradius, idnumber, type, size, race, creature, politics):
+    __slots__ = ['parent', 'rect', 'id', 'planet_id', 'type', 'size',
+                 'star_faring', 'race_name', 'star_resources',
+                 'monster', 'coup', 'sov', 'resources', 'startangle',
+                 'endangle', 'iradius', 'oradius', 'averadius',
+                 'center', 'collision_points', 'fillcolor', 'stacks']
     def __init__(self, parent, center, iradius, oradius, environdict):
         self.parent = parent
         self.rect = pygame.Rect(center[0] - oradius, center[1] - oradius, oradius * 2, oradius * 2)
-        self.id = int(environdict["id"])
-        self.planet_id = environdict["planet_id"]
-        self.type = environdict["type"]
-        self.size = environdict["size"]
-        self.star_faring = environdict["star_faring"]
-        self.race_name = environdict["race_name"]
-        self.star_resources = environdict["star_resources"]
-        self.monster = environdict["monster"]
-        self.coup = environdict["coup"]
-        self.sov = environdict["sov"]
-        self.resources = environdict["resources"]
-        
+        properties = ('id', 'planet_id', 'type', 'size' 'star_faring',
+                      'race_name', 'star_resources', 'monster', 'coup', 'sov',
+                      'resources')
+        for prop in properties:
+            setattr(self, prop, environdict[prop])
+        self.id = int(self.id)
         self.startangle = STARTANGLE + (self.id * UNITANGLE)
         self.endangle = self.startangle + UNITANGLE
         self.iradius = iradius
