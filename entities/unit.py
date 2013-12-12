@@ -12,17 +12,14 @@ class Unit(pygame.sprite.DirtySprite):
                  'prev_image', 'dirty', 'stack_list']
     def __init__(self, charflag, unitdict):
         pygame.sprite.DirtySprite.__init__(self)
-        self.id = unitdict["id"]
-        self.stack_id = unitdict["stack_id"]
-        self.side = unitdict["side"]
-        self.endurance = unitdict["endurance"]
+        for prop in ['id', 'stack_id', 'side', 'endurance']:
+            setattr(self, prop, unitdict[prop])
         
         if charflag is False:
             self.charflag = charflag
             self.name = unitdict["type"]
-            self.mobile = unitdict["mobile"]
-            self.environ_combat = unitdict["environ_combat"]
-            self.space_combat = unitdict["space_combat"]
+            for prop in ['mobile', 'environ_combat', 'space_combat']:
+                setattr(self, prop, unitdict[prop])
             self.image, self.rect = load_image("DrJ.png")
             
         if charflag is True:
