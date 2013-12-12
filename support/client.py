@@ -44,3 +44,6 @@ def move( stack, location ):
     
 def csplit ( stack, char):
     return c.split_stack ( stack_id = stack, character_id = char )
+    
+def usplit ( stack, unit ):
+    return c.split_stack ( stack_id = stack, unit_id = char)
