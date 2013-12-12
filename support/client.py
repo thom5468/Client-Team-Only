@@ -23,6 +23,12 @@ def getstuff(value):
     if value == 's':
         return c.get_state('test1', "Stack")["response"]["stack"]
 
+envs = getstuff('e')
+planets = getstuff('p')
+chars = getstuff('c')
+units = getstuff('u')
+stacks = getstuff('s')
+    
 def getall():
     envs = getstuff('e')
     planets = getstuff('p')
@@ -48,3 +54,4 @@ def csplit ( stack, char):
     
 def usplit ( stack, unit ):
     return c.split_stack ( stack_id = stack, unit_id = char)
+    
