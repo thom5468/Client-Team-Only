@@ -1,7 +1,7 @@
 '''
 Created on Nov 28, 2013
 
-@author: Sean
+@author: Sean Harris
 '''
 
 import pygame
